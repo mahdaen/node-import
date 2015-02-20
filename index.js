@@ -172,6 +172,56 @@ InlineScript.prototype = {
     fetch: function() {
         var $this = this;
 
+        /* Getting Namespace */
+        var nsp = this.text.match(nspRegEx);
+
+        if (nsp) {
+            nsp.forEach(function(namespace) {
+                /* Getting Namespace name */
+                var name = namespace.replace(/\@namespace\s+/, '');
+
+                /* Copying script text */
+                var text = $this.text;
+
+                /* Getting Function blocks to escape local variables */
+                var fnblock = text.match(fnbRegEx);
+
+                if (fnblock) {
+                    /* Removing function blocks in temporary script to prevent capturing local variables */
+                    fnblock.forEach(function(fnstring) {
+                        text = text.replace(fnstring, '');
+                    });
+                }
+
+                /* Getting global variable lists */
+                var vrtb = text.match(/var\s+[a-zA-Z\d\_]+\s+\=/g);
+
+                /* Creating Namespace content block */
+                var nspblock = '\n\n/* $NAMESPACES$ */\n' + name + '.push({ ';
+
+                /* Registering global variables */
+                vrtb.forEach(function (vars) {
+                    vars = vars.replace(/var\s+/, '').replace(/\s+\=/, '');
+                    nspblock += vars + ': ' + vars + ', '
+                });
+
+                /* Closing Namespace content block */
+                nspblock += '});\n';
+
+                /* Registering Namespace */
+                var nmsp = 'var ' + name + ' = new Namespace(\'' + name + '\');';
+
+                $this.text = $this.text.replace('"' + namespace + '";', nmsp);
+                $this.text = $this.text.replace("'" + namespace + "';", nmsp);
+
+                $this.text = $this.text.replace('"' + namespace + '"', nmsp);
+                $this.text = $this.text.replace("'" + namespace + "'", nmsp);
+
+                /* Append to current scripts */
+                $this.text += nspblock;
+            });
+        }
+
         /* Getting Dependencies pattern */
         var dep = this.text.match(impRegEx);
 
@@ -258,6 +308,8 @@ InlineScript.prototype = {
 
 /* RegEx to get import patterns */
 var impRegEx = /\@import\s+[a-zA-Z\d\.\_\-\/\.\,\$\@\#\!\~\s\&\*\(\)\+\\]+/g;
+var nspRegEx = /\@namespace\s+[a-zA-Z\d_\$]+/g;
+var fnbRegEx = /(function\s?)([^\.])([\w|,|\s|-|_|\$]*)(.+?\{)([^\.][\s|\S]*(?=\}))/g;
 
 /* Current Working Directory Lists */
 var WorkingDirectory = function() {
@@ -287,7 +339,7 @@ WorkingDirectory.prototype = {
         try {
             pc.chdir(this.cwds + nextdir);
         } catch (err) {
-            throw 'Unable to solve directory: ' + this.cwds + nextdir + '\n' + err;
+            throw cl.red('Unable to solve directory: ') + cl.yellow(this.cwds + nextdir) + '\n' + err;
         }
 
         return this;
@@ -304,5 +356,30 @@ WorkingDirectory.prototype = {
 
     get: function() {
         return pc.cwd();
+    }
+}
+
+/* Namespace Constructor */
+var Namespace = function(name) {
+    if (typeof name === 'string') {
+        this.constructor.name = name;
+    }
+
+    return this;
+}
+
+Namespace.prototype = {
+    push: function(obj) {
+        var $namespace = this;
+
+        if (typeof obj === 'object' && !obj.length) {
+            for (var key in obj) {
+                if (obj.hasOwnProperty(key)) {
+                    $namespace[key] = obj[key];
+                }
+            }
+        }
+
+        return this;
     }
 }

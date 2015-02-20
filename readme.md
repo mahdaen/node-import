@@ -15,11 +15,14 @@ To use the CLI support, install it globally.
 npm install -g node-import
 ```
 
-### **Syntax**
+### **Import/Export**
+Import another scripts and run/export to file.
+
+#### **Syntax**
 ***
 Use the `'@import [file ..]';` to import the dependencies. It's should be string, like when you use `use strict`.
 
-### **Example**
+#### **Example**
 ***
 ##### `test.js`
 ```js
@@ -47,6 +50,37 @@ var libA = 'Foo is bar foobar';
 '@import libs/lib-a.js, libs/lib-c.js';
 '@import libs/*.js';
 ```
+
+### **Namespace**
+Namespace provide ability to keep the global variables of file is not overwritten by other references.
+
+#### **Syntax**
+You can define namespace by using `'@namespace $NAME$`;`. Like import, it's should be string as well.
+
+#### **Exapmle**
+
+##### `foo.js`
+```js
+// Importing libs.
+'@import bar.js';
+
+// Private vars.
+var myfoo = 'Foo of foo.js';
+var exfoo = bar.foo + myfoo;
+
+// Global vars.
+var spfoo = foobar + ' is global';
+```
+
+##### `bar.js`
+```js
+// Create namespace
+'@namespace bar';
+
+var foo = 'Foo of Bar';
+var foobar = 'Global foobar';
+```
+
 
 ### **Usage**
 #### `NodeJS`
