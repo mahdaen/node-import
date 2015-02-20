@@ -1,6 +1,6 @@
 {
   "name": "node-import",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "main": "index.js",
   "description": "Imports dependencies and run it directly or concatenate them and exports to file.",
   "keywords": [
@@ -23,7 +23,7 @@
     "test": "test"
   },
   "bin": {
-    "node-import": "./bin/import.js"
+    "node-import": "./bin/node-import"
   },
   "dependencies": {
     "colors": "^1.0.3",
@@ -32,6 +32,6 @@
     "uglify-js": "^2.4.16"
   },
   "scripts": {
-    "test": "node test/index.js"
+    "test": "node bin/node-import test/people.js -e -o test/out -v"
   }
 }

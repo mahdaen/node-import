@@ -1,9 +1,12 @@
-#!/usr/bin/env node
+#! /usr/bin/env node
+// -*- js -*-
 
-var colors = require('colors/safe');
-var optimis = require('optimist');
-var imports = require('../index.js');
-var package = require('../package.json');
+"use strict";
+
+var COLORS = require('colors/safe');
+var OPTIMIS = require('optimist');
+var IMPORTS = require('../index.js');
+var PACKAGE = require('../package.json');
 
 /* Boolean Getter */
 var tobool = function(obj) {
@@ -30,34 +33,34 @@ var tobool = function(obj) {
 
 /* Usage Help */
 var usage =
-    colors.cyan('NodeJS Scripts Export (' + package.name + ')\n') +
-    colors.green('Version: ') + package.version + '\n' +
-    colors.green('Description: ') + package.description + '\n' +
-    colors.green('Usage: ') + colors.yellow('import') + ' ' + colors.cyan('[options] [files ...]');
+    COLORS.cyan('NodeJS Scripts Import/Export (' + PACKAGE.name + ')\n') +
+    COLORS.green('v' + PACKAGE.version + '\n') +
+    PACKAGE.description + '\n\n' +
+    COLORS.green('Usage: ') + COLORS.yellow('import') + ' ' + COLORS.cyan('[options] [files ...]');
 
 /* Executor */
 var exec = function (argv) {
-    var run = tobool(argv.r);
-    var asy = tobool(argv.a);
-    var exp = tobool(argv.e);
-    var min = tobool(argv.u);
-    var map = tobool(argv.s);
-    var dir = 'string' == typeof argv.o ? argv.o : null;
+    var RUN = tobool(argv.r);
+    var ASY = tobool(argv.a);
+    var EXP = tobool(argv.e);
+    var MIN = tobool(argv.u);
+    var MAP = tobool(argv.s);
+    var DIR = 'string' == typeof argv.o ? argv.o : null;
 
     var opt = {
-        exec: run,
-        sync: !asy,
-        export: exp,
-        exportDir: dir,
-        exportMin: min,
-        exportMap: map,
+        exec: RUN,
+        sync: !ASY,
+        export: EXP,
+        exportDir: DIR,
+        exportMin: MIN,
+        exportMap: MAP,
     }
 
-    return imports(argv._, opt, argv.v);
+    return IMPORTS(argv._, opt, argv.v);
 }
 
 /* Registering Options */
-optimis
+OPTIMIS
     .usage(usage)
     .options('r', {
         describe: 'Run imported scripts.',
@@ -99,7 +102,7 @@ optimis
     })
     .check(function (argv) {
         if (argv.h) {
-            return optimis.showHelp();
+            return OPTIMIS.showHelp();
         } else {
             if (!argv._.length) {
                 throw new Error("input required");

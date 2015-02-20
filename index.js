@@ -39,6 +39,9 @@ var imports = function(source, options, verbose) {
     var cwd = new WorkingDirectory(), script;
 
     if ('string' === typeof source) {
+        /* Get start time */
+        var pfstart = new Date().getTime();
+
         /* Ensure no error when options undefined */
         options = !options ? {} : options;
 
@@ -77,6 +80,10 @@ var imports = function(source, options, verbose) {
         if (opt.export) {
             var expfile = opt.exportDir.replace(/\/$/, '') + '/' + script.filename;
 
+            if (verbose) {
+                console.log(cl.blue('\nExporting to ') + cl.yellow.bold(expfile));
+            }
+
             /* Touch Target File */
             fe.ensureFileSync(expfile);
 
@@ -112,9 +119,21 @@ var imports = function(source, options, verbose) {
                     }
                 }
 
+                if (verbose) {
+                    console.log(cl.blue('Exporting minified version to ') + cl.yellow.bold(ugfile + '.min.js'));
+                }
+
                 fe.ensureFileSync(ugfile + '.min.js');
                 fs.writeFileSync(ugfile + '.min.js', uglified.code);
             }
+        }
+
+        var pfends = new Date().getTime();
+        var pfcoun = (pfends - pfstart);
+        pfcoun = pfcoun < 1000 ? pfcoun + 'ms' : (pfcoun / 1000) + 's';
+
+        if (verbose) {
+            console.log(cl.blue('\nImport finished in ') + cl.magenta.bold(pfcoun));
         }
 
         return script.get();
@@ -180,6 +199,12 @@ InlineScript.prototype = {
                 /* Getting Namespace name */
                 var name = namespace.replace(/\@namespace\s+/, '');
 
+                /* Registering Namespace */
+                if ($this.verbose) {
+                    console.log(cl.green('Registering Namespace ') + cl.yellow.bold(name));
+                }
+                var nmsp = 'var ' + name + ' = new Namespace(\'' + name + '\');';
+
                 /* Copying script text */
                 var text = $this.text;
 
@@ -202,15 +227,18 @@ InlineScript.prototype = {
                 /* Registering global variables */
                 vrtb.forEach(function (vars) {
                     vars = vars.replace(/var\s+/, '').replace(/\s+\=/, '');
+
+                    if ($this.verbose) {
+                        console.log(cl.green('Registering ') + cl.cyan.bold(vars) + cl.green(' to ') + cl.yellow.bold(name));
+                    }
+
                     nspblock += vars + ': ' + vars + ', '
                 });
 
                 /* Closing Namespace content block */
                 nspblock += '});\n';
 
-                /* Registering Namespace */
-                var nmsp = 'var ' + name + ' = new Namespace(\'' + name + '\');';
-
+                /* Appending Namespace */
                 $this.text = $this.text.replace('"' + namespace + '";', nmsp);
                 $this.text = $this.text.replace("'" + namespace + "';", nmsp);
 
@@ -293,7 +321,7 @@ InlineScript.prototype = {
 
     run: function() {
         if (this.verbose) {
-            console.log(cl.green('Evaluating imported scripts...'));
+            console.log(cl.blue.bold('\nEvaluating imported scripts...'));
         }
 
         try {
