@@ -125,6 +125,15 @@ var imports = function(source, options, verbose) {
 
                 fe.ensureFileSync(ugfile + '.min.js');
                 fs.writeFileSync(ugfile + '.min.js', uglified.code);
+
+                if (opt.exportMap) {
+                    if (verbose) {
+                        console.log(cl.blue('Exporting sourcemap to ') + cl.yellow.bold(ugfile + '.min.map'));
+                    }
+
+                    fe.ensureFileSync(ugfile + '.min.map');
+                    fs.writeFileSync(ugfile + '.min.map', uglified.map);
+                }
             }
         }
 
