@@ -1,33 +1,37 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8">
+    <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Node-import by mahdaen</title>
-
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="javascripts/scale.fix.js"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
+    <title>Node-import by mahdaen</title>
   </head>
+
   <body>
-    <div class="wrapper">
-      <header>
-        <h1>Node-import</h1>
-        <p>Imports dependencies and run it directly or concatenate them and exports to file.</p>
-        <p class="view"><a href="https://github.com/mahdaen/node-import">View the Project on GitHub <small>mahdaen/node-import</small></a></p>
-        <ul>
-          <li><a href="https://github.com/mahdaen/node-import/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/mahdaen/node-import/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/mahdaen/node-import">View On <strong>GitHub</strong></a></li>
-        </ul>
-      </header>
-      <section>
-        <h1>
+    <div id="container">
+      <div class="inner">
+
+        <header>
+          <h1>Node-import</h1>
+          <h2>Imports dependencies and run it directly or concatenate them and exports to file.</h2>
+        </header>
+
+        <section id="downloads" class="clearfix">
+          <a href="https://github.com/mahdaen/node-import/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+          <a href="https://github.com/mahdaen/node-import/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          <a href="https://github.com/mahdaen/node-import" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        </section>
+
+        <hr>
+
+        <section id="main_content">
+          <h1>
 <a id="nodejs-import" class="anchor" href="#nodejs-import" aria-hidden="true"><span class="octicon octicon-link"></span></a>NodeJS Import</h1>
 
 <p>Imports dependencies and run it directly or concatenate them and exports to file.
@@ -49,16 +53,22 @@ But when I thinking how to do that, I think I need to create script that can con
 </code></pre>
 
 <h3>
-<a id="syntax" class="anchor" href="#syntax" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Syntax</strong>
+<a id="importexport" class="anchor" href="#importexport" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Import/Export</strong>
 </h3>
+
+<p>Import another scripts and run/export to file.</p>
+
+<h4>
+<a id="syntax" class="anchor" href="#syntax" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Syntax</strong>
+</h4>
 
 <hr>
 
 <p>Use the <code>'@import [file ..]';</code> to import the dependencies. It's should be string, like when you use <code>use strict</code>.</p>
 
-<h3>
+<h4>
 <a id="example" class="anchor" href="#example" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Example</strong>
-</h3>
+</h4>
 
 <hr>
 
@@ -90,6 +100,46 @@ But when I thinking how to do that, I think I need to create script that can con
 <span class="pl-c">// Imports multiple files.</span>
 <span class="pl-s1"><span class="pl-pds">'</span>@import libs/lib-a.js, libs/lib-c.js<span class="pl-pds">'</span></span>;
 <span class="pl-s1"><span class="pl-pds">'</span>@import libs/*.js<span class="pl-pds">'</span></span>;</pre></div>
+
+<h3>
+<a id="namespace" class="anchor" href="#namespace" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Namespace</strong>
+</h3>
+
+<p>Namespace provide ability to keep the global variables of file is not overwritten by other references.</p>
+
+<h4>
+<a id="syntax-1" class="anchor" href="#syntax-1" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Syntax</strong>
+</h4>
+
+<p>You can define namespace by using <code>'@namespace $NAME$</code>;`. Like import, it's should be string as well.</p>
+
+<h4>
+<a id="exapmle" class="anchor" href="#exapmle" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Exapmle</strong>
+</h4>
+
+<h5>
+<a id="foojs" class="anchor" href="#foojs" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>foo.js</code>
+</h5>
+
+<div class="highlight highlight-js"><pre><span class="pl-c">// Importing libs.</span>
+<span class="pl-s1"><span class="pl-pds">'</span>@import bar.js<span class="pl-pds">'</span></span>;
+
+<span class="pl-c">// Private vars.</span>
+<span class="pl-s">var</span> myfoo <span class="pl-k">=</span> <span class="pl-s1"><span class="pl-pds">'</span>Foo of foo.js<span class="pl-pds">'</span></span>;
+<span class="pl-s">var</span> exfoo <span class="pl-k">=</span> bar.foo <span class="pl-k">+</span> myfoo;
+
+<span class="pl-c">// Global vars.</span>
+<span class="pl-s">var</span> spfoo <span class="pl-k">=</span> foobar <span class="pl-k">+</span> <span class="pl-s1"><span class="pl-pds">'</span> is global<span class="pl-pds">'</span></span>;</pre></div>
+
+<h5>
+<a id="barjs" class="anchor" href="#barjs" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>bar.js</code>
+</h5>
+
+<div class="highlight highlight-js"><pre><span class="pl-c">// Create namespace</span>
+<span class="pl-s1"><span class="pl-pds">'</span>@namespace bar<span class="pl-pds">'</span></span>;
+
+<span class="pl-s">var</span> foo <span class="pl-k">=</span> <span class="pl-s1"><span class="pl-pds">'</span>Foo of Bar<span class="pl-pds">'</span></span>;
+<span class="pl-s">var</span> foobar <span class="pl-k">=</span> <span class="pl-s1"><span class="pl-pds">'</span>Global foobar<span class="pl-pds">'</span></span>;</pre></div>
 
 <h3>
 <a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Usage</strong>
@@ -176,13 +226,15 @@ imports(<span class="pl-s1"><span class="pl-pds">'</span>./test.js<span class="p
 
 <pre><code>node-import -e -o test/out test/index.js
 </code></pre>
-      </section>
+        </section>
+
+        <footer>
+          Node-import is maintained by <a href="https://github.com/mahdaen">mahdaen</a><br>
+          This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
+        </footer>
+
+        
+      </div>
     </div>
-    <footer>
-      <p>Project maintained by <a href="https://github.com/mahdaen">mahdaen</a></p>
-      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
-    </footer>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-    
   </body>
 </html>
