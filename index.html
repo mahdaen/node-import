@@ -1,0 +1,188 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Node-import by mahdaen</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Node-import</h1>
+        <p>Imports dependencies and run it directly or concatenate them and exports to file.</p>
+        <p class="view"><a href="https://github.com/mahdaen/node-import">View the Project on GitHub <small>mahdaen/node-import</small></a></p>
+        <ul>
+          <li><a href="https://github.com/mahdaen/node-import/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/mahdaen/node-import/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/mahdaen/node-import">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a id="nodejs-import" class="anchor" href="#nodejs-import" aria-hidden="true"><span class="octicon octicon-link"></span></a>NodeJS Import</h1>
+
+<p>Imports dependencies and run it directly or concatenate them and exports to file.
+Before I write this, I just think if I can concatenate my scripts with direct import in each file.
+But when I thinking how to do that, I think I need to create script that can concatenate and run it.</p>
+
+<h3>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Installation</strong>
+</h3>
+
+<hr>
+
+<pre><code>npm install --save node-import
+</code></pre>
+
+<p>To use the CLI support, install it globally.</p>
+
+<pre><code>npm install -g node-import
+</code></pre>
+
+<h3>
+<a id="syntax" class="anchor" href="#syntax" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Syntax</strong>
+</h3>
+
+<hr>
+
+<p>Use the <code>'@import [file ..]';</code> to import the dependencies. It's should be string, like when you use <code>use strict</code>.</p>
+
+<h3>
+<a id="example" class="anchor" href="#example" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Example</strong>
+</h3>
+
+<hr>
+
+<h5>
+<a id="testjs" class="anchor" href="#testjs" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>test.js</code>
+</h5>
+
+<div class="highlight highlight-js"><pre><span class="pl-c">// Importing dependencies at begining.</span>
+<span class="pl-s1"><span class="pl-pds">'</span>@import libs/lib-a.js<span class="pl-pds">'</span></span>;
+<span class="pl-s1"><span class="pl-pds">'</span>@import libs/lib-b.js<span class="pl-pds">'</span></span>;
+
+<span class="pl-s">var</span> a <span class="pl-k">=</span> <span class="pl-s1"><span class="pl-pds">'</span>Test..<span class="pl-pds">'</span></span>;
+
+<span class="pl-c">// Create variable from file lib-a.js.</span>
+<span class="pl-s">var</span> b <span class="pl-k">=</span> libaA;
+
+<span class="pl-en">console</span><span class="pl-s3">.log</span>(a, b);</pre></div>
+
+<h5>
+<a id="libslib-ajs" class="anchor" href="#libslib-ajs" aria-hidden="true"><span class="octicon octicon-link"></span></a>
+<code>libs/lib-a.js</code>;</h5>
+
+<div class="highlight highlight-js"><pre><span class="pl-c">// Create library to be used by test.js</span>
+<span class="pl-s">var</span> libA <span class="pl-k">=</span> <span class="pl-s1"><span class="pl-pds">'</span>Foo is bar foobar<span class="pl-pds">'</span></span>;
+
+<span class="pl-c">// Import is not always in begining, and relative to cwd of lib-a.js.</span>
+<span class="pl-s1"><span class="pl-pds">'</span>@import lib-c.js<span class="pl-pds">'</span></span>;
+
+<span class="pl-c">// Imports multiple files.</span>
+<span class="pl-s1"><span class="pl-pds">'</span>@import libs/lib-a.js, libs/lib-c.js<span class="pl-pds">'</span></span>;
+<span class="pl-s1"><span class="pl-pds">'</span>@import libs/*.js<span class="pl-pds">'</span></span>;</pre></div>
+
+<h3>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Usage</strong>
+</h3>
+
+<h4>
+<a id="nodejs" class="anchor" href="#nodejs" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>NodeJS</code>
+</h4>
+
+<hr>
+
+<p><code>imports(files, [options (object)]);</code></p>
+
+<h5>
+<a id="options" class="anchor" href="#options" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>options</code>
+</h5>
+
+<ul>
+<li>
+<code>exec</code> Execute the imported scripts. Default <code>true</code>
+</li>
+<li>
+<code>sync</code> Execute the imported scripts in synchronus mode. Default <code>true</code>
+</li>
+<li>
+<code>export</code> Export imported scripts to file. Default <code>false</code>
+</li>
+<li>
+<code>exportDir</code> Export location.</li>
+<li>
+<code>exportMin</code> Include minified version when exporting. Default <code>true</code>
+</li>
+<li>
+<code>exportMap</code> Include sourcemap when uglifying. Default <code>true</code> <em>(not yet tested)</em>
+</li>
+</ul>
+
+<div class="highlight highlight-js"><pre><span class="pl-s">var</span> imports <span class="pl-k">=</span> <span class="pl-s3">require</span>(<span class="pl-s1"><span class="pl-pds">'</span>node-import<span class="pl-pds">'</span></span>);
+
+<span class="pl-c">// Just execute.</span>
+imports(<span class="pl-s1"><span class="pl-pds">'</span>./test.js<span class="pl-pds">'</span></span>);
+
+<span class="pl-c">// Execute and get the scripts.</span>
+<span class="pl-s">var</span> result <span class="pl-k">=</span> imports(<span class="pl-s1"><span class="pl-pds">'</span>./test.js<span class="pl-pds">'</span></span>);
+
+<span class="pl-c">// Only export the scripts.</span>
+imports(<span class="pl-s1"><span class="pl-pds">'</span>./test.js<span class="pl-pds">'</span></span>, { exec<span class="pl-k">:</span> <span class="pl-c1">false</span>, export<span class="pl-k">:</span> <span class="pl-c1">true</span>, exportDir<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">'</span>./test/out<span class="pl-pds">'</span></span> });</pre></div>
+
+<h4>
+<a id="cli" class="anchor" href="#cli" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>CLI</code>
+</h4>
+
+<hr>
+
+<p><code>node-import [options] [file ..]</code></p>
+
+<h5>
+<a id="options-1" class="anchor" href="#options-1" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>options</code>
+</h5>
+
+<ul>
+<li>
+<code>-r</code> Run imported scripts. Default <code>true</code>
+</li>
+<li>
+<code>-a</code> Run in async mode. Default <code>false</code>
+</li>
+<li>
+<code>-e</code> Export imported scripts. Default <code>false</code>
+</li>
+<li>
+<code>-u</code> Include uglify when exporting scripts. Default <code>true</code>
+</li>
+<li>
+<code>-s</code> Include sourcemap when uglifying. Default <code>true</code>
+</li>
+<li>
+<code>-o</code> Output directory to export.</li>
+<li>
+<code>-v</code> Logs all processes.</li>
+<li>
+<code>-h</code> Show helps.</li>
+</ul>
+
+<pre><code>node-import -e -o test/out test/index.js
+</code></pre>
+      </section>
+    </div>
+    <footer>
+      <p>Project maintained by <a href="https://github.com/mahdaen">mahdaen</a></p>
+      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
+    </footer>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
