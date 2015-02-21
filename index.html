@@ -34,9 +34,22 @@
           <h1>
 <a id="nodejs-import" class="anchor" href="#nodejs-import" aria-hidden="true"><span class="octicon octicon-link"></span></a>NodeJS Import</h1>
 
-<p>Imports dependencies and run it directly or concatenate them and exports to file.
-Before I write this, I just think if I can concatenate my scripts with direct import in each file.
-But when I thinking how to do that, I think I need to create script that can concatenate and run it.</p>
+<p>Imports dependencies and run it directly (sync/async) or concatenate them and exports to file.</p>
+
+<h3>
+<a id="why" class="anchor" href="#why" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Why?</strong>
+</h3>
+
+<p>Before I write this, I just think if I can concatenate my scripts with direct import in each file.
+But when I thinking how to do that, I think I need to create script that can concatenate and run it,
+as well supporting synchronus mode without headache.</p>
+
+<p>By default, imported scripts executed in synchronus mode, since for async purpose nodejs already have it,
+even we have <code>async</code> module.</p>
+
+<p>We know that asynchronus evented I/O model is the benefits of nodejs. But sometimes, probably we need to runs
+synchronus scripts, especially when we create some modules and we need to separate the files but we need
+to ensure each files can communicate with each others, including the global variables in each files.</p>
 
 <h3>
 <a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Installation</strong>
@@ -162,7 +175,7 @@ But when I thinking how to do that, I think I need to create script that can con
 <code>exec</code> Execute the imported scripts. Default <code>true</code>
 </li>
 <li>
-<code>sync</code> Execute the imported scripts in synchronus mode. Default <code>true</code>
+<code>async</code> Execute the imported scripts in async mode. Default <code>false</code>
 </li>
 <li>
 <code>export</code> Export imported scripts to file. Default <code>false</code>
@@ -226,6 +239,15 @@ imports(<span class="pl-s1"><span class="pl-pds">'</span>./test.js<span class="p
 
 <pre><code>node-import -e -o test/out test/index.js
 </code></pre>
+
+<h2>
+<a id="release-history" class="anchor" href="#release-history" aria-hidden="true"><span class="octicon octicon-link"></span></a>Release History</h2>
+
+<ul>
+<li>2015-02-21        v0.1.3      "Fixing mistakes with <code>async</code> option."</li>
+<li>2015-02-21        v0.1.2      "Adding namespace support."</li>
+<li>2015-02-21        v0.1.1      "First release."</li>
+</ul>
         </section>
 
         <footer>
