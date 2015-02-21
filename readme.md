@@ -3,6 +3,8 @@ NodeJS Import
 Imports dependencies and run it directly (sync/async) or concatenate them and exports to file.
 
 ### **Why?**
+***
+
 Before I write this, I just think if I can concatenate my scripts with direct import in each file.
 But when I thinking how to do that, I think I need to create script that can concatenate and run it,
 as well supporting synchronus mode without headache.
@@ -16,6 +18,7 @@ to ensure each files can communicate with each others, including the global vari
 
 ### **Installation**
 ***
+
 ```
 npm install --save node-import
 ```
@@ -30,10 +33,12 @@ Import another scripts and run/export to file.
 
 #### **Syntax**
 ***
+
 Use the `'@import [file ..]';` to import the dependencies. It's should be string, like when you use `use strict`.
 
 #### **Example**
 ***
+
 ##### `test.js`
 ```js
 // Importing dependencies at begining.
@@ -65,9 +70,12 @@ var libA = 'Foo is bar foobar';
 Namespace provide ability to keep the global variables of file is not overwritten by other references.
 
 #### **Syntax**
+***
+
 You can define namespace by using `'@namespace $NAME$`;`. Like import, it's should be string as well.
 
-#### **Exapmle**
+#### **Example**
+***
 
 ##### `foo.js`
 ```js
@@ -95,6 +103,7 @@ var foobar = 'Global foobar';
 ### **Usage**
 #### `NodeJS`
 ***
+
 `imports(files, [options (object)]);`
 
 ##### `options`
@@ -120,6 +129,7 @@ imports('./test.js', { exec: false, export: true, exportDir: './test/out' });
 
 #### `CLI`
 ***
+
 `node-import [options] [file ..]`
 
 ##### `options`
