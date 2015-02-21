@@ -1,8 +1,18 @@
 NodeJS Import
 ===========
-Imports dependencies and run it directly or concatenate them and exports to file.
+Imports dependencies and run it directly (sync/async) or concatenate them and exports to file.
+
+### **Why?**
 Before I write this, I just think if I can concatenate my scripts with direct import in each file.
-But when I thinking how to do that, I think I need to create script that can concatenate and run it.
+But when I thinking how to do that, I think I need to create script that can concatenate and run it,
+as well supporting synchronus mode without headache.
+
+By default, imported scripts executed in synchronus mode, since for async purpose nodejs already have it,
+even we have `async` module.
+
+We know that asynchronus evented I/O model is the benefits of nodejs. But sometimes, probably we need to runs
+synchronus scripts, especially when we create some modules and we need to separate the files but we need
+to ensure each files can communicate with each others, including the global variables in each files.
 
 ### **Installation**
 ***
@@ -89,7 +99,7 @@ var foobar = 'Global foobar';
 
 ##### `options`
 - `exec` Execute the imported scripts. Default `true`
-- `sync` Execute the imported scripts in synchronus mode. Default `true`
+- `async` Execute the imported scripts in async mode. Default `false`
 - `export` Export imported scripts to file. Default `false`
 - `exportDir` Export location.
 - `exportMin` Include minified version when exporting. Default `true`
@@ -125,3 +135,8 @@ imports('./test.js', { exec: false, export: true, exportDir: './test/out' });
 ```
 node-import -e -o test/out test/index.js
 ```
+
+## Release History
+* 2015-02-21        v0.1.3      "Fixing mistakes with `async` option."
+* 2015-02-21        v0.1.2      "Adding namespace support."
+* 2015-02-21        v0.1.1      "First release."

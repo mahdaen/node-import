@@ -48,7 +48,7 @@ var imports = function(source, options, verbose) {
         /* Getting Options */
         var opt = {
             exec: options.exec === undefined ? true : options.exec,
-            sync: options.sync === undefined ? true : options.sync,
+            async: options.async === undefined ? false : options.async,
 
             export: options.export === undefined ? false : options.export,
             exportDir: options.exportDir || pc.cwd() + '/' + pt.dirname(source) + '/export',
@@ -59,15 +59,15 @@ var imports = function(source, options, verbose) {
 
         /* If scripts should be executed */
         if (opt.exec) {
-            /* If execute in sync mode */
-            if (opt.sync) {
+            /* If execute in async mode */
+            if (opt.async) {
                 script = new InlineScript(cwd, source, true, verbose);
-                script.run();
             }
 
-            /* If execute in async */
+            /* If execute in sync */
             else {
                 script = new InlineScript(cwd, source, false, verbose);
+                script.run();
             }
         }
 
@@ -155,7 +155,7 @@ var InlineScript = function(cwd, file, sync, verbose) {
     this.file = file;
     this.text = '';
 
-    this.sync = sync === undefined ? true : sync;
+    this.async = sync === undefined ? true : sync;
 
     this.filename = pt.basename(file);
     this.dirname = pt.dirname(file);
@@ -201,10 +201,10 @@ InlineScript.prototype = {
         var $this = this;
 
         /* Getting Namespace */
-        var nsp = this.text.match(nspRegEx);
+        var namesp = this.text.match(nspRegEx);
 
-        if (nsp) {
-            nsp.forEach(function(namespace) {
+        if (namesp) {
+            namesp.forEach(function(namespace) {
                 /* Getting Namespace name */
                 var name = namespace.replace(/\@namespace\s+/, '');
 
@@ -286,12 +286,12 @@ InlineScript.prototype = {
 
                 if (nfile) {
                     nfile.forEach(function(file) {
-                        var ils = new InlineScript($this.cwds, file, $this.sync, $this.verbose);
+                        var ils = new InlineScript($this.cwds, file, $this.async, $this.verbose);
                         multiscripts += ils.text + '\n';
                     });
 
                     /* If inline scripts created and execute in synchronus mode, replace pattern with script text */
-                    if ($this.sync) {
+                    if ($this.async) {
                         $this.text = $this.text.replace("'" + file + "'" + ';', multiscripts);
                         $this.text = $this.text.replace('"' + file + '"' + ';', multiscripts);
 
@@ -302,10 +302,10 @@ InlineScript.prototype = {
 
                 else {
                     /* Creating new Inline Script */
-                    var ils = new InlineScript($this.cwds, file.replace(/\@import\s+/, ''), $this.sync, $this.verbose);
+                    var ils = new InlineScript($this.cwds, file.replace(/\@import\s+/, ''), $this.async, $this.verbose);
 
                     /* If inline scripts created and execute in synchronus mode, replace pattern with script text */
-                    if (ils && $this.sync) {
+                    if (ils && !$this.async) {
                         $this.text = $this.text.replace("'" + file + "'" + ';', ils.text);
                         $this.text = $this.text.replace('"' + file + '"' + ';', ils.text);
 
@@ -317,7 +317,7 @@ InlineScript.prototype = {
         }
 
         /* If script should be executed in async mode */
-        if ($this.sync === false) {
+        if ($this.async) {
             $this.run();
         }
 
