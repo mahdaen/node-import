@@ -5,6 +5,7 @@ var fe = require('fs-extra');
 var pt = require('path');
 var ug = require('uglify-js');
 var cl = require('colors/safe');
+var bt = require('js-beautify').js_beautify;
 
 /* Exporting Modules */
 module.exports = function(source, options, verbose) {
@@ -88,7 +89,10 @@ var imports = function(source, options, verbose) {
             fe.ensureFileSync(expfile);
 
             /* Write script to target file */
-            fs.writeFileSync(expfile, script.text);
+            fs.writeFileSync(expfile, bt(script.text, {
+                indent_size: 4,
+                space_after_anon_function: true,
+            }).replace(/[\n\r]{3}/g, '\r\n\r\n'));
 
             /* If uglify */
             if (opt.exportMin) {
@@ -198,21 +202,33 @@ InlineScript.prototype = {
     },
 
     fetch: function() {
-        var $this = this;
+        var $this = this, finalscripts = '';
+
+        /* Collected Scripts */
+        var scriptmaps = [];
 
         /* Getting Namespace */
         var namesp = this.text.match(nspRegEx);
+
+        /* Creating Namespace content block and child holder */
+        var nspblock, nspchilds = [];
 
         if (namesp) {
             namesp.forEach(function(namespace) {
                 /* Getting Namespace name */
                 var name = namespace.replace(/\@namespace\s+/, '');
 
+                /* Namespace push start */
+                nspblock = '\n\n' + name + '.push({ ';
+
+                /* Registering name to itself */
+                $this.namespace = name;
+
                 /* Registering Namespace */
                 if ($this.verbose) {
                     console.log(cl.green('Registering Namespace ') + cl.yellow.bold(name));
                 }
-                var nmsp = '// NAMESPACE START  --------------------\n' + 'var ' + name + ' = new Namespace(\'' + name + '\');';
+                var nmsp = '// @open namespace => \n' + 'var ' + name + ' = new Namespace(\'' + name + '\');';
 
                 /* Copying script text */
                 var text = $this.text;
@@ -239,9 +255,6 @@ InlineScript.prototype = {
                 }
 
                 if (vrtb) {
-                    /* Creating Namespace content block */
-                    var nspblock = '\n\n' + name + '.push({ ';
-
                     /* Registering global variables */
                     vrtb.forEach(function (vars) {
                         vars = vars.replace(/var?\s+/, '').replace(/\s+\=/, '').replace(/\s+/g, '').replace(/\n/g, '').replace(/,/g, '');
@@ -252,20 +265,14 @@ InlineScript.prototype = {
 
                         nspblock += vars + ': ' + vars + ', '
                     });
-
-                    /* Closing Namespace content block */
-                    nspblock += '});\n// NAMESPACE END    --------------------\n';
-
-                    /* Appending Namespace */
-                    $this.text = $this.text.replace('"' + namespace + '";', nmsp);
-                    $this.text = $this.text.replace("'" + namespace + "';", nmsp);
-
-                    $this.text = $this.text.replace('"' + namespace + '"', nmsp);
-                    $this.text = $this.text.replace("'" + namespace + "'", nmsp);
-
-                    /* Append to current scripts */
-                    $this.text += nspblock;
                 }
+
+                /* Appending Namespace */
+                $this.text = $this.text.replace('"' + namespace + '";', nmsp);
+                $this.text = $this.text.replace("'" + namespace + "';", nmsp);
+
+                $this.text = $this.text.replace('"' + namespace + '"', nmsp);
+                $this.text = $this.text.replace("'" + namespace + "'", nmsp);
             });
         }
 
@@ -275,52 +282,62 @@ InlineScript.prototype = {
         /* If found, extract the dependencies */
         if (dep) {
             dep.forEach(function(file) {
-                var nfile, multiscripts = '';
+                var multiple, multiscripts = '';
 
+                /* Search comma separated file list and split it if found */
                 if (file.search(/\,/) > -1) {
-                    nfile = file.replace(/\@import\s+/, '');
-                    nfile = nfile.split(/\s?\,\s+/);
+                    multiple = file.replace(/\@import\s+/, '');
+                    multiple = multiple.split(/\s?\,\s+/);
                 }
 
+                /* Search for directory file list */
                 else if (file.search(/\*/) > -1) {
                     dir = pt.dirname(file.replace(/\@import\s+/, ''));
 
+                    /* Reading directory */
                     files = fs.readdirSync(pc.cwd() + '/' + dir);
 
-                    nfile = [];
+                    /* Creating filename array */
+                    multiple = [];
 
+                    /* Pushing files in dir to array */
                     files.forEach(function(file) {
-                        nfile.push(dir + '/' + file);
+                        multiple.push(dir + '/' + file);
                     });
                 }
 
-                if (nfile) {
-                    nfile.forEach(function(file) {
-                        var ils = new InlineScript($this.cwds, file, $this.async, $this.verbose);
-                        multiscripts += ils.text + '\n';
+                /* Proceed multiple imports */
+                if (multiple) {
+                    multiple.forEach(function(file) {
+                        var ilScript = new InlineScript($this.cwds, file, $this.async, $this.verbose);
+
+                        if (ilScript) {
+                            multiscripts += ilScript.text + '\n';
+
+                            if (namesp && ilScript.namespace) {
+                                nspchilds.push(ilScript.namespace);
+                            }
+                        }
                     });
 
                     /* If inline scripts created and execute in synchronus mode, replace pattern with script text */
-                    if ($this.async) {
-                        $this.text = $this.text.replace("'" + file + "'" + ';', multiscripts);
-                        $this.text = $this.text.replace('"' + file + '"' + ';', multiscripts);
-
-                        $this.text = $this.text.replace("'" + file + "'", multiscripts);
-                        $this.text = $this.text.replace('"' + file + '"', multiscripts);
+                    if (multiscripts) {
+                        scriptmaps.push({ name: file, scripts: multiscripts });
                     }
                 }
 
+                /* Proceed single import */
                 else {
                     /* Creating new Inline Script */
-                    var ils = new InlineScript($this.cwds, file.replace(/\@import\s+/, ''), $this.async, $this.verbose);
+                    var ilScript = new InlineScript($this.cwds, file.replace(/\@import\s+/, ''), $this.async, $this.verbose);
 
                     /* If inline scripts created and execute in synchronus mode, replace pattern with script text */
-                    if (ils && !$this.async) {
-                        $this.text = $this.text.replace("'" + file + "'" + ';', ils.text);
-                        $this.text = $this.text.replace('"' + file + '"' + ';', ils.text);
+                    if (ilScript) {
+                        scriptmaps.push({ name: file, scripts: ilScript.text });
 
-                        $this.text = $this.text.replace("'" + file + "'", ils.text);
-                        $this.text = $this.text.replace('"' + file + '"', ils.text);
+                        if (namesp && ilScript.namespace) {
+                            nspchilds.push(ilScript.namespace);
+                        }
                     }
                 }
             });
@@ -330,6 +347,29 @@ InlineScript.prototype = {
         if ($this.async) {
             $this.run();
         }
+
+        /* Close namespace after iterating namespace */
+        if (namesp) {
+            /* Iterating child namespace */
+            nspchilds.forEach(function(name) {
+                nspblock += name + ': ' + name + ', '
+            });
+
+            /* Closing Namespace content block */
+            nspblock += '});\r\n// @close namespace <= \r\n';
+
+            /* Append to current scripts */
+            $this.text += nspblock;
+        }
+
+        /* Replacing Dependencies pattern with scripts */
+        scriptmaps.forEach(function(item) {
+            $this.text = $this.text.replace("'" + item.name + "'" + ';', item.scripts);
+            $this.text = $this.text.replace('"' + item.name + '"' + ';', item.scripts);
+
+            $this.text = $this.text.replace("'" + item.name + "'", item.scripts);
+            $this.text = $this.text.replace('"' + item.name + '"', item.scripts);
+        });
 
         return this;
     },

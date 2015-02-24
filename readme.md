@@ -156,6 +156,7 @@ node-import -e -o test/out test/index.js
 ```
 
 ## Release History
+* 2015-02-24        v0.1.6      "Fixing namespace and async orders."
 * 2015-02-24        v0.1.5      "Fixing bugs with no-exec."
 * 2015-02-24        v0.1.4      "Updating namespace variable getter"
 * 2015-02-21        v0.1.3      "Fixing mistakes with `async` option."
