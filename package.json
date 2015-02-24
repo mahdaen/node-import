@@ -1,6 +1,6 @@
 {
     "name": "node-import",
-    "version": "0.1.7",
+    "version": "0.1.8",
     "main": "index.js",
     "description": "Imports dependencies and run it directly or concatenate them and exports to file.",
     "keywords": [

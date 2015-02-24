@@ -65,7 +65,7 @@ OPTIMIS
     .options('r', {
         describe: 'Run imported scripts.',
         type: 'boolean',
-        default: true
+        default: false
     })
     .options('a', {
         describe: 'Run in async mode.',
@@ -80,12 +80,12 @@ OPTIMIS
     .options('u', {
         describe: 'Uglify exported scripts.',
         type: 'boolean',
-        default: true
+        default: false
     })
     .options('s', {
         describe: 'Include sourcemap of exported scripts.',
         type: 'boolean',
-        default: true
+        default: false
     })
     .options('o', {
         describe: 'Output directory for exported scripts.',

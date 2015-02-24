@@ -1,3 +1,6 @@
+/* Global Wrapper */
+var $ = global;
+
 /* Required Modules */
 var pc = process;
 var fs = require('fs');
@@ -53,8 +56,8 @@ var imports = function(source, options, verbose) {
 
             export: options.export === undefined ? false : options.export,
             exportDir: options.exportDir || pc.cwd() + '/' + pt.dirname(source) + '/export',
-            exportMin: options.exportMin || true,
-            exportMap: options.exportMap || false,
+            exportMin: options.exportMin === undefined ? true : options.exportMin,
+            exportMap: options.exportMap === undefined ? false : options.exportMap,
             exportOptions: options.exportOptions || undefined
         }
 
@@ -383,8 +386,9 @@ InlineScript.prototype = {
             console.log(cl.blue.bold('\nEvaluating imported scripts...'));
         }
 
+        /* Try to evaluate scripts on global context */
         try {
-            eval(this.text);
+            (1, eval)(this.text);
         } catch (err) {
             throw err;
         }
@@ -447,7 +451,7 @@ WorkingDirectory.prototype = {
 }
 
 /* Namespace Constructor */
-var Namespace = function(name) {
+$.Namespace = function(name) {
     if (typeof name === 'string') {
         this.constructor.name = name;
     }
@@ -455,7 +459,7 @@ var Namespace = function(name) {
     return this;
 }
 
-Namespace.prototype = {
+$.Namespace.prototype = {
     push: function(obj) {
         var $namespace = this;
 
@@ -468,5 +472,5 @@ Namespace.prototype = {
         }
 
         return this;
-    }
+    },
 }

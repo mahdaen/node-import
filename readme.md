@@ -142,20 +142,30 @@ imports('./test.js', { exec: false, export: true, exportDir: './test/out' });
 `node-import [options] [file ..]`
 
 ##### `options`
-- `-r` Run imported scripts. Default `true`
+- `-r` Run imported scripts. Default `false`
 - `-a` Run in async mode. Default `false`
 - `-e` Export imported scripts. Default `false`
-- `-u` Include uglify when exporting scripts. Default `true`
-- `-s` Include sourcemap when uglifying. Default `true`
+- `-u` Include uglify when exporting scripts. Default `false`
+- `-s` Include sourcemap when uglifying. Default `false`
 - `-o` Output directory to export.
 - `-v` Logs all processes.
 - `-h` Show helps.
 
+###### **Run**
 ```
-node-import -e -o test/out test/index.js
+$ node-import -r test/index.js 
 ```
 
+###### **Export**
+```
+$ node-import -e -o test/out test/index.js
+```
+
+## **NOTES**
+NodeImport always run imported scripts on `global` context. Be carefull with a words `eval is evil` ;)
+
 ## Release History
+* 2015-02-25        v0.1.8      "Changing execution context, Fixing Uglify and Sourcemap issue and modifying CLI methods."
 * 2015-02-25        v0.1.7      "Adding js-beautify."
 * 2015-02-25        v0.1.6      "Fixing namespace and async orders."
 * 2015-02-24        v0.1.5      "Fixing bugs with no-exec."
