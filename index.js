@@ -73,7 +73,7 @@ var imports = function(source, options, verbose) {
 
         /* If no execute */
         else {
-            script = new InlineScript(cwd, source, true, verbose);
+            script = new InlineScript(cwd, source, false, verbose);
         }
 
         /* If export the imported scripts */
