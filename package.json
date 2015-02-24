@@ -1,6 +1,6 @@
 {
     "name": "node-import",
-    "version": "0.1.6",
+    "version": "0.1.7",
     "main": "index.js",
     "description": "Imports dependencies and run it directly or concatenate them and exports to file.",
     "keywords": [
@@ -30,6 +30,7 @@
     "dependencies": {
         "colors": "^1.0.3",
         "fs-extra": "^0.16.3",
+        "js-beautify": "^1.5.4",
         "optimist": "^0.6.1",
         "uglify-js": "^2.4.16"
     },
