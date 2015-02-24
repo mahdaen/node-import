@@ -1,9 +1,13 @@
-var imports = require('../index.js');
+'@import data/home.js';
+'@import data/about.js';
 
-var result = imports('test/src/a.js', {
-    exec: true,
-    export: true,
-    exportDir: 'test/out',
-    exportMin: true,
-    exportMap: true
-}, true);
+/* Test Global Var */
+console.log(title);
+
+/* Test private var */
+console.log(home.title, home.$name);
+console.log(about.title);
+
+/* Test Namespace Object */
+console.log(home);
+console.log(about);

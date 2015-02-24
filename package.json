@@ -1,37 +1,39 @@
 {
-  "name": "node-import",
-  "version": "0.1.3",
-  "main": "index.js",
-  "description": "Imports dependencies and run it directly or concatenate them and exports to file.",
-  "keywords": [
-    "import",
-    "node-import",
-    "import",
-    "scripts"
-  ],
-  "author": "Nanang Mahdaen El Agung <nanang@mahdaen.name>",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/mahdaen/node-import.git"
-  },
-  "bugs": {
-    "url": "https://github.com/mahdaen/node-import/issues"
-  },
-  "homepage": "https://github.com/mahdaen/node-import",
-  "directories": {
-    "test": "test"
-  },
-  "bin": {
-    "node-import": "./bin/node-import"
-  },
-  "dependencies": {
-    "colors": "^1.0.3",
-    "fs-extra": "^0.16.3",
-    "optimist": "^0.6.1",
-    "uglify-js": "^2.4.16"
-  },
-  "scripts": {
-    "test": "node bin/node-import test/people.js -e -o test/out -v"
-  }
+    "name": "node-import",
+    "version": "0.1.4",
+    "main": "index.js",
+    "description": "Imports dependencies and run it directly or concatenate them and exports to file.",
+    "keywords": [
+        "import",
+        "node-import",
+        "import",
+        "scripts",
+        "concat",
+        "uglify"
+    ],
+    "author": "Nanang Mahdaen El Agung <nanang@mahdaen.name>",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/mahdaen/node-import.git"
+    },
+    "bugs": {
+        "url": "https://github.com/mahdaen/node-import/issues"
+    },
+    "homepage": "https://github.com/mahdaen/node-import",
+    "directories": {
+        "test": "test"
+    },
+    "bin": {
+        "node-import": "./bin/node-import"
+    },
+    "dependencies": {
+        "colors": "^1.0.3",
+        "fs-extra": "^0.16.3",
+        "optimist": "^0.6.1",
+        "uglify-js": "^2.4.16"
+    },
+    "scripts": {
+        "test": "node bin/node-import test/people.js -e -o test/out -v"
+    }
 }

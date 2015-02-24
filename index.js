@@ -212,7 +212,7 @@ InlineScript.prototype = {
                 if ($this.verbose) {
                     console.log(cl.green('Registering Namespace ') + cl.yellow.bold(name));
                 }
-                var nmsp = 'var ' + name + ' = new Namespace(\'' + name + '\');';
+                var nmsp = '// NAMESPACE START  --------------------\n' + 'var ' + name + ' = new Namespace(\'' + name + '\');';
 
                 /* Copying script text */
                 var text = $this.text;
@@ -228,34 +228,44 @@ InlineScript.prototype = {
                 }
 
                 /* Getting global variable lists */
-                var vrtb = text.match(/var\s+[a-zA-Z\d\_]+\s+\=/g);
+                var vrtb = text.match(/[\n\,\s]+[a-zA-Z\d\_\$]+\s?\=/g);
 
-                /* Creating Namespace content block */
-                var nspblock = '\n\n/* $NAMESPACES$ */\n' + name + '.push({ ';
+                if (vrtb) {
+                    var vrta = text.match(/var\s+[a-zA-Z\d\_\$]+\s?\=/g);
 
-                /* Registering global variables */
-                vrtb.forEach(function (vars) {
-                    vars = vars.replace(/var\s+/, '').replace(/\s+\=/, '');
-
-                    if ($this.verbose) {
-                        console.log(cl.green('Registering ') + cl.cyan.bold(vars) + cl.green(' to ') + cl.yellow.bold(name));
+                    if (vrta) {
+                        vrtb.concat(vrta);
                     }
+                }
 
-                    nspblock += vars + ': ' + vars + ', '
-                });
+                if (vrtb) {
+                    /* Creating Namespace content block */
+                    var nspblock = '\n\n' + name + '.push({ ';
 
-                /* Closing Namespace content block */
-                nspblock += '});\n';
+                    /* Registering global variables */
+                    vrtb.forEach(function (vars) {
+                        vars = vars.replace(/var?\s+/, '').replace(/\s+\=/, '').replace(/\s+/g, '').replace(/\n/g, '').replace(/,/g, '');
 
-                /* Appending Namespace */
-                $this.text = $this.text.replace('"' + namespace + '";', nmsp);
-                $this.text = $this.text.replace("'" + namespace + "';", nmsp);
+                        if ($this.verbose) {
+                            console.log(cl.green('Registering ') + cl.cyan.bold(vars) + cl.green(' to ') + cl.yellow.bold(name));
+                        }
 
-                $this.text = $this.text.replace('"' + namespace + '"', nmsp);
-                $this.text = $this.text.replace("'" + namespace + "'", nmsp);
+                        nspblock += vars + ': ' + vars + ', '
+                    });
 
-                /* Append to current scripts */
-                $this.text += nspblock;
+                    /* Closing Namespace content block */
+                    nspblock += '});\n// NAMESPACE END    --------------------\n';
+
+                    /* Appending Namespace */
+                    $this.text = $this.text.replace('"' + namespace + '";', nmsp);
+                    $this.text = $this.text.replace("'" + namespace + "';", nmsp);
+
+                    $this.text = $this.text.replace('"' + namespace + '"', nmsp);
+                    $this.text = $this.text.replace("'" + namespace + "'", nmsp);
+
+                    /* Append to current scripts */
+                    $this.text += nspblock;
+                }
             });
         }
 

@@ -68,11 +68,20 @@ var libA = 'Foo is bar foobar';
 
 ### **Namespace**
 Namespace provide ability to keep the global variables of file is not overwritten by other references.
+Namespace is limited. It's only read `global` variables and should started with new line. E.g
+
+```js
+var a = 0; // Accepted
+
+b = 1, c = 3; // Accepted
+
+if (a = 0) d = 3; // Ignored.
+```
 
 #### **Syntax**
 ***
 
-You can define namespace by using `'@namespace $NAME$`;`. Like import, it's should be string as well.
+You can define namespace by using `'@namespace $NAME$';`. Like import, it's should be string as well.
 
 #### **Example**
 ***
