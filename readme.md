@@ -165,6 +165,7 @@ $ node-import -e -o test/out test/index.js
 NodeImport always run imported scripts on `global` context. Be carefull with a words `eval is evil` ;)
 
 ## Release History
+* 2015-02-26        v0.2.1      "Fixing error defining root"
 * 2015-02-26        v0.2.0      "Adding namespace constructor to each converted js, to makes namespacing available in browser."
 * 2015-02-26        v0.1.9      "Adding $root pattern to define as root cwd."
 * 2015-02-25        v0.1.8      "Changing execution context, Fixing Uglify and Sourcemap issue and modifying CLI methods."
