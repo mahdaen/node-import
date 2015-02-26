@@ -415,8 +415,8 @@ WorkingDirectory.prototype = {
         if (typeof dirname == 'string') {
             dirname = dirname.replace(/[\'\"\;]+/g, '');
 
-            if (dirname.match(/^\$ROOT\$/)) {
-                dirname = dirname.replace(/^\$ROOT\$/, '');
+            if (dirname.match(/^\$root/)) {
+                dirname = dirname.replace(/^\$root/, '');
             } else {
                 dirname = (this[this.length - 1] || '') + (dirname == '.' ? '' : '/' + dirname);
             }
