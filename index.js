@@ -10,6 +10,8 @@ var ug = require('uglify-js');
 var cl = require('colors/safe');
 var bt = require('js-beautify').js_beautify;
 
+var $r = process.cwd();
+
 /* Exporting Modules */
 module.exports = function(source, options, verbose) {
     /* Single file import */
@@ -158,6 +160,10 @@ var imports = function(source, options, verbose) {
 
 /* Script Reader */
 var InlineScript = function(cwd, file, sync, verbose) {
+    if (typeof file === 'string') {
+        file = file.replace(/[\'\"\;]+/g, '');
+    }
+
     this.cwds = cwd;
     this.file = file;
     this.text = '';
@@ -219,7 +225,7 @@ InlineScript.prototype = {
         if (namesp) {
             namesp.forEach(function(namespace) {
                 /* Getting Namespace name */
-                var name = namespace.replace(/\@namespace\s+/, '');
+                var name = namespace.replace(/\@namespace\s+/, '').replace(/[\'\"\;]+/g, '');
 
                 /* Namespace push start */
                 nspblock = '\n\n' + name + '.push({ ';
@@ -271,11 +277,7 @@ InlineScript.prototype = {
                 }
 
                 /* Appending Namespace */
-                $this.text = $this.text.replace('"' + namespace + '";', nmsp);
-                $this.text = $this.text.replace("'" + namespace + "';", nmsp);
-
-                $this.text = $this.text.replace('"' + namespace + '"', nmsp);
-                $this.text = $this.text.replace("'" + namespace + "'", nmsp);
+                $this.text = $this.text.replace(namespace, nmsp);
             });
         }
 
@@ -367,11 +369,7 @@ InlineScript.prototype = {
 
         /* Replacing Dependencies pattern with scripts */
         scriptmaps.forEach(function(item) {
-            $this.text = $this.text.replace("'" + item.name + "'" + ';', item.scripts);
-            $this.text = $this.text.replace('"' + item.name + '"' + ';', item.scripts);
-
-            $this.text = $this.text.replace("'" + item.name + "'", item.scripts);
-            $this.text = $this.text.replace('"' + item.name + '"', item.scripts);
+            $this.text = $this.text.replace(item.name, item.scripts);
         });
 
         return this;
@@ -398,8 +396,8 @@ InlineScript.prototype = {
 }
 
 /* RegEx to get import patterns */
-var impRegEx = /\@import\s+[a-zA-Z\d\.\_\-\/\.\,\$\@\#\!\~\s\&\*\(\)\+\\]+/g;
-var nspRegEx = /\@namespace\s+[a-zA-Z\d_\$]+/g;
+var impRegEx = /[\'\"]\@import\s+[a-zA-Z\d\.\_\-\/\.\,\$\@\#\!\~\s\&\*\+\\]+[\'\"\;]+/g;
+var nspRegEx = /[\'\"]\@namespace\s+[a-zA-Z\d_\$]+[\'\"\;]+/g;
 var fnbRegEx = /(function\s?)([^\.])([\w|,|\s|-|_|\$]*)(.+?\{)([^\.][\s|\S]*(?=\}))/g;
 
 /* Current Working Directory Lists */
@@ -415,7 +413,13 @@ var WorkingDirectory = function() {
 WorkingDirectory.prototype = {
     push: function(dirname) {
         if (typeof dirname == 'string') {
-            dirname = (this[this.length - 1] || '') + (dirname == '.' ? '' : '/' + dirname);
+            dirname = dirname.replace(/[\'\"\;]+/g, '');
+
+            if (dirname.match(/^\$ROOT\$/)) {
+                dirname = dirname.replace(/^\$ROOT\$/, '');
+            } else {
+                dirname = (this[this.length - 1] || '') + (dirname == '.' ? '' : '/' + dirname);
+            }
 
             this[this.length] = dirname;
             this.length++;
@@ -427,10 +431,13 @@ WorkingDirectory.prototype = {
     apply: function() {
         var nextdir = this[this.length - 1] || '';
 
+        nextdir = nextdir.replace(/^\//, '');
+        nextdir = this.cwds.replace(/\/$/, '') + '/' + nextdir;
+
         try {
-            pc.chdir(this.cwds + nextdir);
+            pc.chdir(nextdir);
         } catch (err) {
-            throw cl.red('Unable to solve directory: ') + cl.yellow(this.cwds + nextdir) + '\n' + err;
+            throw cl.red('Unable to solve directory: ') + cl.yellow(nextdir) + '\n' + err;
         }
 
         return this;

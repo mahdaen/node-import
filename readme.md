@@ -29,7 +29,7 @@ npm install -g node-import
 ```
 
 ### **Import/Export**
-Import another scripts and run/export to file.
+Import another scripts and run/export to file. Use `$root` as pattern to define as `root` cwd. E.g `@import $root/lib/a.js`.
 
 #### **Syntax**
 ***
@@ -165,6 +165,7 @@ $ node-import -e -o test/out test/index.js
 NodeImport always run imported scripts on `global` context. Be carefull with a words `eval is evil` ;)
 
 ## Release History
+* 2015-02-25        v0.1.9      "Adding $root pattern to define as root cwd."
 * 2015-02-25        v0.1.8      "Changing execution context, Fixing Uglify and Sourcemap issue and modifying CLI methods."
 * 2015-02-25        v0.1.7      "Adding js-beautify."
 * 2015-02-25        v0.1.6      "Fixing namespace and async orders."
