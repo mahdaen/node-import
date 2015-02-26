@@ -94,7 +94,7 @@ var imports = function(source, options, verbose) {
             fe.ensureFileSync(expfile);
 
             /* Write script to target file */
-            fs.writeFileSync(expfile, bt(script.text, {
+            fs.writeFileSync(expfile, nspcons + bt(script.text, {
                 indent_size: 4,
                 space_after_anon_function: true,
             }).replace(/[\n\r]{3}/g, '\r\n\r\n'));
@@ -481,3 +481,6 @@ $.Namespace.prototype = {
         return this;
     },
 }
+
+/* Namespace Constructor */
+var nspcons = "var _GLB = global || window; if (!_GLB.Namespace) {_GLB.Namespace = function(name) {if (typeof name === 'string') {this.constructor.name = name;}return this;};_GLB.Namespace.prototype = {push: function(obj) {var $namespace = this;if (typeof obj === 'object' && !obj.length) {for (var key in obj) {if (obj.hasOwnProperty(key)) {$namespace[key] = obj[key];}}}return this;},}}\n\n";

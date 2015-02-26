@@ -1,6 +1,9 @@
+var _GLB = global || window; if (!_GLB.Namespace) {_GLB.Namespace = function(name) {if (typeof name === 'string') {this.constructor.name = name;}return this;};_GLB.Namespace.prototype = {push: function(obj) {var $namespace = this;if (typeof obj === 'object' && !obj.length) {for (var key in obj) {if (obj.hasOwnProperty(key)) {$namespace[key] = obj[key];}}}return this;},}}
+
 var cl = require('colors/safe');
 
 /* Importing Teams */
+// @open namespace => 
 var michael = new Namespace('michael');
 
 var age = 17;
@@ -11,9 +14,14 @@ var profile = function () {
 
 var bar = 'Bar from Michael';
 
-/* $NAMESPACES$ */
-michael.push({ age: age, profile: profile, bar: bar, });
+michael.push({
+    age: age,
+    profile: profile,
+    bar: bar,
+});
+// @close namespace <= 
 
+// @open namespace => 
 var smith = new Namespace('smith');
 
 var age = 19;
@@ -24,9 +32,14 @@ var profile = function () {
 
 var foo = 'Foo from Smith';
 
-/* $NAMESPACES$ */
-smith.push({ age: age, profile: profile, foo: foo, });
+smith.push({
+    age: age,
+    profile: profile,
+    foo: foo,
+});
+// @close namespace <= 
 
+// @open namespace => 
 var william = new Namespace('william');
 
 var age = 15;
@@ -37,9 +50,12 @@ var profile = function () {
 
 var foobar = 'Foobar from William';
 
-/* $NAMESPACES$ */
-william.push({ age: age, profile: profile, foobar: foobar, });
-
+william.push({
+    age: age,
+    profile: profile,
+    foobar: foobar,
+});
+// @close namespace <= 
 
 /* Showing Michael */
 console.log(cl.green('\nIt should be display profile of Michael with age overriden by William'));
@@ -72,5 +88,3 @@ console.log(bar);
 
 console.log(cl.green('\nIt should be display "foobar" from William'));
 console.log(foobar);
-
-
