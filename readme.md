@@ -1,4 +1,4 @@
-NodeJS Import
+Node Import
 ===========
 Imports dependencies and run it directly (sync/async) or concatenate them and exports to file.
 
@@ -15,6 +15,9 @@ even we have `async` module.
 We know that asynchronus evented I/O model is the benefits of nodejs. But sometimes, probably we need to runs
 synchronus scripts, especially when we create some modules and we need to separate the files but we need
 to ensure each files can communicate with each others, including the global variables in each files.
+
+Now, you can export the scripts and run it in browser. I mean if you only need to concatenate files
+and minify them but still needs namespace for each file. ;)
 
 ### **Installation**
 ***
@@ -64,6 +67,10 @@ var libA = 'Foo is bar foobar';
 // Imports multiple files.
 '@import libs/lib-a.js, libs/lib-c.js';
 '@import libs/*.js';
+
+// Import without file extension.
+'@import libs/lib';
+'@import libs/lib.config';
 ```
 
 ### **Namespace**
@@ -162,9 +169,10 @@ $ node-import -e -o test/out test/index.js
 ```
 
 ## **NOTES**
-NodeImport always run imported scripts on `global` context. Be carefull with a words `eval is evil` ;)
+NodeImport always runs the imported scripts on `global` context. Be carefull with a words `eval is evil` ;P
 
 ## Release History
+* 2015-03-05        v0.3.0      "Adding support to ignore file extension using plain object as namespace."
 * 2015-02-26        v0.2.1      "Fixing error defining root"
 * 2015-02-26        v0.2.0      "Adding namespace constructor to each converted js, to makes namespacing available in browser."
 * 2015-02-26        v0.1.9      "Adding $root pattern to define as root cwd."

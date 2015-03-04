@@ -5,6 +5,7 @@ var $ = global;
 var pc = process;
 var fs = require('fs');
 var fe = require('fs-extra');
+var gl = require('glob');
 var pt = require('path');
 var ug = require('uglify-js');
 var cl = require('colors/safe');
@@ -94,7 +95,7 @@ var imports = function(source, options, verbose) {
             fe.ensureFileSync(expfile);
 
             /* Write script to target file */
-            fs.writeFileSync(expfile, nspcons + bt(script.text, {
+            fs.writeFileSync(expfile, bt(script.text, {
                 indent_size: 4,
                 space_after_anon_function: true,
             }).replace(/[\n\r]{3}/g, '\r\n\r\n'));
@@ -182,21 +183,72 @@ var InlineScript = function(cwd, file, sync, verbose) {
 /* Script Reader Prototypes */
 InlineScript.prototype = {
     read: function() {
-        var scripttext;
+        var scripttext, $this = this;
 
         /* Changing CWD */
         this.cwds.push(this.dirname).apply();
 
+        /* Get relative CWD */
+        var ccwd = this.cwds.get().replace(this.cwds.cwds, '');
+
         /* Log in verbose */
         if (this.verbose) {
-            console.log(cl.cyan.bold.italic('@import') + ': ' + cl.yellow(this.cwds.get().replace(this.cwds.cwds, '') + '/' + this.filename));
+            console.log(cl.cyan.bold.italic('@import') + ': ' + cl.yellow(ccwd + '/' + this.filename));
         }
 
-        /* Reading Script File */
-        try {
-            scripttext = fs.readFileSync(this.filename, 'utf8');
-        } catch (err) {
-            throw err;
+        if (!fs.existsSync(this.filename)) {
+            /* Log in verbose */
+            if (this.verbose) {
+                console.log(cl.red.bold.italic('Can\'t resolve') + ' ' + cl.yellow(ccwd + '/' + this.filename));
+                console.log(cl.blue.bold.italic('Searcing') + ' ' + cl.yellow(ccwd + '/' + this.filename + '.*'));
+            }
+
+            var res = gl.sync(this.filename + '*');
+
+            if (res.length > 0) {
+                scripttext = '';
+
+                if (this.verbose) {
+                    var lgs = '';
+
+                    res.forEach(function(file, i) {
+                        lgs += ccwd + '/' + file + (i != (res.length - 1) ? ',' : '');
+                    });
+
+                    console.log(cl.magenta.bold.italic('Found') + ': ' + cl.yellow(lgs));
+                }
+
+                res.forEach(function(file) {
+                    /* Log in verbose */
+                    if ($this.verbose) {
+                        console.log(cl.cyan.bold.italic('@import') + ': ' + cl.yellow(ccwd + '/' + file));
+                    }
+
+                    /* Reading each script file found */
+                    try {
+                        scripttext += fs.readFileSync(file, 'utf8');
+                    } catch (err) {
+                        throw cl.red('EFS: ') + cl.cyan('@import ' + this.filename) + err;
+                    }
+
+                    $this.filename = file;
+                });
+            }
+
+            else {
+                throw cl.red('EFS: ') + cl.cyan('@import ' + this.filename) + ' => '
+                + cl.yellow.bold(ccwd + '/' + this.filename)
+                + cl.red(' no such file or directory!');
+            }
+        }
+
+        else {
+            /* Reading Script File */
+            try {
+                scripttext = fs.readFileSync(this.filename, 'utf8');
+            } catch (err) {
+                throw cl.red('EFS: ') + cl.cyan('@import ' + this.filename) + err;
+            }
         }
 
         if (scripttext) {
@@ -228,7 +280,7 @@ InlineScript.prototype = {
                 var name = namespace.replace(/\@namespace\s+/, '').replace(/[\'\"\;]+/g, '');
 
                 /* Namespace push start */
-                nspblock = '\n\n' + name + '.push({ ';
+                nspblock = '\r\n\r\n// @write namespace %( ' + name + ' %) => \r\n' + 'var ' + name + ' = {\r\n';
 
                 /* Registering name to itself */
                 $this.namespace = name;
@@ -237,7 +289,12 @@ InlineScript.prototype = {
                 if ($this.verbose) {
                     console.log(cl.green('Registering Namespace ') + cl.yellow.bold(name));
                 }
-                var nmsp = '// @open namespace => \n' + 'var ' + name + ' = new Namespace(\'' + name + '\');';
+
+                /* Appending Dashes */
+                var nmsp = '// '; for (var i = 1; i < 100; ++i) { nmsp += '-'; } nmsp += '\r\n';
+
+                /* Opening Namespace */
+                nmsp += '// @open namespace %( ' + name + ' )% =>\r\n';
 
                 /* Copying script text */
                 var text = $this.text;
@@ -265,19 +322,19 @@ InlineScript.prototype = {
 
                 if (vrtb) {
                     /* Registering global variables */
-                    vrtb.forEach(function (vars) {
+                    vrtb.forEach(function (vars, i) {
                         vars = vars.replace(/var?\s+/, '').replace(/\s+\=/, '').replace(/\s+/g, '').replace(/\n/g, '').replace(/,/g, '');
 
                         if ($this.verbose) {
                             console.log(cl.green('Registering ') + cl.cyan.bold(vars) + cl.green(' to ') + cl.yellow.bold(name));
                         }
 
-                        nspblock += vars + ': ' + vars + ', '
+                        nspblock += vars + ': ' + vars + (i != (vrtb.length - 1) ? ', ' : '')
                     });
                 }
 
                 /* Appending Namespace */
-                $this.text = $this.text.replace(namespace, nmsp);
+                $this.text = $this.text.replace(new RegExp(namespace + '[\r\n]+'), nmsp);
             });
         }
 
@@ -357,11 +414,14 @@ InlineScript.prototype = {
         if (namesp) {
             /* Iterating child namespace */
             nspchilds.forEach(function(name) {
-                nspblock += name + ': ' + name + ', '
+                nspblock += ',' + name + ': ' + name
             });
 
             /* Closing Namespace content block */
-            nspblock += '});\r\n// @close namespace <= \r\n';
+            nspblock += '};\r\n// @close namespace %( ' + this.namespace + ' )% <= \r\n';
+
+            /* Appending Dashes */
+            nspblock += '// '; for (var i = 1; i < 100; ++i) { nspblock += '-'; } nspblock += '\r\n';
 
             /* Append to current scripts */
             $this.text += nspblock;
@@ -437,7 +497,7 @@ WorkingDirectory.prototype = {
         try {
             pc.chdir(nextdir);
         } catch (err) {
-            throw cl.red('Unable to solve directory: ') + cl.yellow(nextdir) + '\n' + err;
+            throw cl.red('EFS: Unable to solve directory: ') + cl.yellow(nextdir) + '\n' + err;
         }
 
         return this;
@@ -481,6 +541,3 @@ $.Namespace.prototype = {
         return this;
     },
 }
-
-/* Namespace Constructor */
-var nspcons = "var _GLB = 'undefined' != typeof global ? global : window; if (!_GLB.Namespace) {_GLB.Namespace = function(name) {if (typeof name === 'string') {this.constructor.name = name;}return this;};_GLB.Namespace.prototype = {push: function(obj) {var $namespace = this;if (typeof obj === 'object' && !obj.length) {for (var key in obj) {if (obj.hasOwnProperty(key)) {$namespace[key] = obj[key];}}}return this;},}}\n\n";

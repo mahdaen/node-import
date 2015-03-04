@@ -1,7 +1,7 @@
 var cl = require('colors/safe');
 
 /* Importing Teams */
-'@import team/michael.ns.js';
+'@import team/michael.ns';
 '@import team/smith.ns.js';
 '@import team/william.ns.js';
 

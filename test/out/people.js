@@ -1,11 +1,8 @@
-var _GLB = global || window; if (!_GLB.Namespace) {_GLB.Namespace = function(name) {if (typeof name === 'string') {this.constructor.name = name;}return this;};_GLB.Namespace.prototype = {push: function(obj) {var $namespace = this;if (typeof obj === 'object' && !obj.length) {for (var key in obj) {if (obj.hasOwnProperty(key)) {$namespace[key] = obj[key];}}}return this;},}}
-
 var cl = require('colors/safe');
 
 /* Importing Teams */
-// @open namespace => 
-var michael = new Namespace('michael');
-
+// ---------------------------------------------------------------------------------------------------
+// @open namespace %( michael )% =>
 var age = 17;
 
 var profile = function () {
@@ -14,16 +11,17 @@ var profile = function () {
 
 var bar = 'Bar from Michael';
 
-michael.push({
+// @write namespace %( michael %) => 
+var michael = {
     age: age,
     profile: profile,
-    bar: bar,
-});
-// @close namespace <= 
+    bar: bar
+};
+// @close namespace %( michael )% <= 
+// ---------------------------------------------------------------------------------------------------
 
-// @open namespace => 
-var smith = new Namespace('smith');
-
+// ---------------------------------------------------------------------------------------------------
+// @open namespace %( smith )% =>
 var age = 19;
 
 var profile = function () {
@@ -32,16 +30,17 @@ var profile = function () {
 
 var foo = 'Foo from Smith';
 
-smith.push({
+// @write namespace %( smith %) => 
+var smith = {
     age: age,
     profile: profile,
-    foo: foo,
-});
-// @close namespace <= 
+    foo: foo
+};
+// @close namespace %( smith )% <= 
+// ---------------------------------------------------------------------------------------------------
 
-// @open namespace => 
-var william = new Namespace('william');
-
+// ---------------------------------------------------------------------------------------------------
+// @open namespace %( william )% =>
 var age = 15;
 
 var profile = function () {
@@ -50,12 +49,14 @@ var profile = function () {
 
 var foobar = 'Foobar from William';
 
-william.push({
+// @write namespace %( william %) => 
+var william = {
     age: age,
     profile: profile,
-    foobar: foobar,
-});
-// @close namespace <= 
+    foobar: foobar
+};
+// @close namespace %( william )% <= 
+// ---------------------------------------------------------------------------------------------------
 
 /* Showing Michael */
 console.log(cl.green('\nIt should be display profile of Michael with age overriden by William'));
