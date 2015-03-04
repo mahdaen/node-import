@@ -172,6 +172,7 @@ $ node-import -e -o test/out test/index.js
 NodeImport always runs the imported scripts on `global` context. Be carefull with a words `eval is evil` ;P
 
 ## Release History
+* 2015-03-05        v0.3.1      "Fixing namespace conflict when using null-extension."
 * 2015-03-05        v0.3.0      "Adding support to ignore file extension using plain object as namespace."
 * 2015-02-26        v0.2.1      "Fixing error defining root"
 * 2015-02-26        v0.2.0      "Adding namespace constructor to each converted js, to makes namespacing available in browser."
