@@ -31,6 +31,109 @@ To use the CLI support, install it globally.
 npm install -g node-import
 ```
 
+### **Usage**
+#### `NodeJS`
+***
+
+`imports(files, [options (object)]);`
+
+##### `options`
+- `exec` - Execute the imported scripts. Default `true`
+- `async` - Execute the imported scripts in async mode. Default `false`
+- `export` - Export imported scripts to file. Default `false`
+- `exportDir` - Export location.
+- `exportMin` - Include minified version when exporting. Default `true`
+- `exportMap` - Include sourcemap when uglifying. Default `true` *(not yet tested)*
+- `RETURNS` - InlineScript object.
+
+```js
+var imports = require('node-import');
+
+// Just execute.
+imports('./test.js');
+
+// Execute and get the scripts.
+var result = imports('./test.js');
+
+// Write out the result.
+fs.writeFile(foofile, result.text, fn);
+
+// Re-call the script.
+result.run();
+
+// Only export the scripts.
+imports('./test.js', { exec: false, export: true, exportDir: './test/out' });
+```
+
+#### `NodeJS - In Module`
+***
+
+`imports.module(files, [params { wrap: origin }], verbose);`
+
+The difference between `imports()` and `imports.module()` is how script loaded.
+`imports()` will evaluate the scripts directly, while `imports.module()` is load the scripts but evaluated by module call.
+
+E.g: `var mod = require('some-module');`. `imports()` inside `some-module` will evaluated directly as soon as module laoded.
+While `imports.module()` will evaluated when `mod()` is called.
+
+##### `Details`
+- `files` - Files to import. E.g: `source/main.js`.
+- `params` - Object contains paramaters to share with imported scripts. `wrap` is variable name to be used, origin is the original object.
+- `verbose` - Show detailed logs.
+- `RETURNS` - InlineScript object.
+
+##### Example in `Gruntfile.js`
+
+```js
+var imports = require('node-import');
+
+module.expors = function(grunt) {
+	// Importing configs.
+	imports.module('./grunt-config/config.js', { loader: grunt });
+};
+```
+
+`grunt-config/config.js`
+
+```js
+// Importing main config and tasks.
+'@import task-list.js`;
+
+// Initializing grunt.
+// "loader" is equal to "grunt" since it's shared by importer above.
+// "config" is namespace from "task-list.js"
+loader.initConfig(config);
+
+// Importing task loader.
+'@import task-loader.js`;
+```
+
+
+#### `CLI`
+***
+
+`node-import [options] [file ..]`
+
+##### `options`
+- `-r` Run imported scripts. Default `false`
+- `-a` Run in async mode. Default `false`
+- `-e` Export imported scripts. Default `false`
+- `-u` Include uglify when exporting scripts. Default `false`
+- `-s` Include sourcemap when uglifying. Default `false`
+- `-o` Output directory to export.
+- `-v` Logs all processes.
+- `-h` Show helps.
+
+###### **Run**
+```
+$ node-import -r test/index.js 
+```
+
+###### **Export**
+```
+$ node-import -e -o test/out test/index.js
+```
+
 ### **Import/Export**
 Import another scripts and run/export to file. Use `$root` as pattern to define as `root` cwd. E.g `@import $root/lib/a.js`.
 
@@ -116,62 +219,12 @@ var foobar = 'Global foobar';
 ```
 
 
-### **Usage**
-#### `NodeJS`
-***
-
-`imports(files, [options (object)]);`
-
-##### `options`
-- `exec` Execute the imported scripts. Default `true`
-- `async` Execute the imported scripts in async mode. Default `false`
-- `export` Export imported scripts to file. Default `false`
-- `exportDir` Export location.
-- `exportMin` Include minified version when exporting. Default `true`
-- `exportMap` Include sourcemap when uglifying. Default `true` *(not yet tested)*
-
-```js
-var imports = require('node-import');
-
-// Just execute.
-imports('./test.js');
-
-// Execute and get the scripts.
-var result = imports('./test.js');
-
-// Only export the scripts.
-imports('./test.js', { exec: false, export: true, exportDir: './test/out' });
-```
-
-#### `CLI`
-***
-
-`node-import [options] [file ..]`
-
-##### `options`
-- `-r` Run imported scripts. Default `false`
-- `-a` Run in async mode. Default `false`
-- `-e` Export imported scripts. Default `false`
-- `-u` Include uglify when exporting scripts. Default `false`
-- `-s` Include sourcemap when uglifying. Default `false`
-- `-o` Output directory to export.
-- `-v` Logs all processes.
-- `-h` Show helps.
-
-###### **Run**
-```
-$ node-import -r test/index.js 
-```
-
-###### **Export**
-```
-$ node-import -e -o test/out test/index.js
-```
-
 ## **NOTES**
-NodeImport always runs the imported scripts on `global` context. Be carefull with a words `eval is evil` ;P
+`imports()` is flexible but always evaluate the imported scripts in the `global` context. Be carefull with a words `eval is evil` ;P
+`imports.module()` evaluate imported scripts in the NodeImport scope. So it's more safe, but limited to share objects since you need to define `params`.
 
 ## Release History
+* 2015-03-05        v0.4.0      "Adding support to import scripts by call it inside a module."
 * 2015-03-05        v0.3.1      "Fixing namespace conflict when using null-extension."
 * 2015-03-05        v0.3.0      "Adding support to ignore file extension using plain object as namespace."
 * 2015-02-26        v0.2.1      "Fixing error defining root"

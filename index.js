@@ -13,8 +13,8 @@ var bt = require('js-beautify').js_beautify;
 
 var $r = process.cwd();
 
-/* Exporting Modules */
-module.exports = function(source, options, verbose) {
+/* Main Importer */
+var Imports = function(source, options, verbose) {
     /* Single file import */
     if ('string' == typeof source) {
         return imports(source, options, verbose);
@@ -40,6 +40,27 @@ module.exports = function(source, options, verbose) {
         }
     }
 }
+
+/* Import Wrapper */
+Imports.module = function(source, params, verbose) {
+    var script = imports(source, { exec: false }, verbose);
+
+    if ('object' == typeof params && !params.length) {
+        for (var key in params) {
+            if (params.hasOwnProperty(key)) {
+                eval('var ' + key + ' = params[key];');
+            }
+        }
+    }
+
+    if (script) {
+        eval(script.get());
+    }
+
+    return script;
+};
+
+module.exports = Imports;
 
 /* Script Importer */
 var imports = function(source, options, verbose) {
@@ -155,7 +176,7 @@ var imports = function(source, options, verbose) {
             console.log(cl.blue('\nImport finished in ') + cl.magenta.bold(pfcoun));
         }
 
-        return script.get();
+        return script;
     }
 }
 
