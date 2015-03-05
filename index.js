@@ -135,7 +135,7 @@ var imports = function(source, options, verbose) {
                     /* If not using custom options */
                     else {
                         uglified = ug.minify(expfile, {
-                            outSourceMap: ugfile + '.map'
+                            outSourceMap: pt.basename(script.file, '.js') + '.min.map'
                         });
                     }
                 }
@@ -162,8 +162,11 @@ var imports = function(source, options, verbose) {
                         console.log(cl.blue('Exporting sourcemap to ') + cl.yellow.bold(ugfile + '.min.map'));
                     }
 
+                    var txtMap = JSON.parse(uglified.map);
+                    txtMap.sources[0] = script.filename;
+
                     fe.ensureFileSync(ugfile + '.min.map');
-                    fs.writeFileSync(ugfile + '.min.map', uglified.map);
+                    fs.writeFileSync(ugfile + '.min.map', JSON.stringify(txtMap));
                 }
             }
         }

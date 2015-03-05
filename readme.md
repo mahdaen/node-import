@@ -224,6 +224,7 @@ var foobar = 'Global foobar';
 `imports.module()` evaluate imported scripts in the NodeImport scope. So it's more safe, but limited to share objects since you need to define `params`.
 
 ## Release History
+* 2015-03-05        v0.4.1      "Fixing source-map sources url mistake."
 * 2015-03-05        v0.4.0      "Adding support to import scripts by call it inside a module."
 * 2015-03-05        v0.3.1      "Fixing namespace conflict when using null-extension."
 * 2015-03-05        v0.3.0      "Adding support to ignore file extension using plain object as namespace."
