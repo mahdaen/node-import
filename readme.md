@@ -32,7 +32,7 @@ npm install -g node-import
 ```
 
 ### **Usage**
-#### `NodeJS`
+### NodeJS
 ***
 
 `imports(files, [options (object)]);`
@@ -65,7 +65,7 @@ result.run();
 imports('./test.js', { exec: false, export: true, exportDir: './test/out' });
 ```
 
-#### `NodeJS - In Module`
+### NodeJS - In Module
 ***
 
 `imports.module(files, [params { wrap: origin }], verbose);`
@@ -83,7 +83,7 @@ While `imports.module()` will evaluated when `mod()` is called.
 - `files` - Files to import. E.g: `source/main.js`.
 - `params` - Object contains paramaters to share with imported scripts. `wrap` is variable name to be used, origin is the original object.
 - `verbose` - Show detailed logs.
-- `RETURNS` - InlineScript object.
+- `RETURNS` - Object contains variables.
 
 ##### Example in `Gruntfile.js`
 
@@ -119,7 +119,7 @@ loader.initConfig(config);
 ```
 
 
-#### `CLI`
+### CLI
 ***
 
 `node-import [options] [file ..]`
