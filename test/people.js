@@ -2,8 +2,8 @@ var cl = require('colors/safe');
 
 /* Importing Teams */
 '@import team/michael.ns';
-'@import team/smith.ns.js';
-'@import team/william.ns.js';
+'@import team/smith.ns';
+'@import team/william.ns';
 
 /* Showing Michael */
 console.log(cl.green('\nIt should be display profile of Michael with age overriden by William'));

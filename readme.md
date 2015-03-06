@@ -73,6 +73,9 @@ imports('./test.js', { exec: false, export: true, exportDir: './test/out' });
 The difference between `imports()` and `imports.module()` is how script loaded.
 `imports()` will evaluate the scripts directly, while `imports.module()` is load the scripts but evaluated by module call.
 
+`imports.module()` also returns `object` contains all global variables in the imported scripts.
+Like `require`, but `imports.module()` will export all variables, not only object in `module.exports`.
+
 E.g: `var mod = require('some-module');`. `imports()` inside `some-module` will evaluated directly as soon as module laoded.
 While `imports.module()` will evaluated when `mod()` is called.
 
@@ -89,13 +92,20 @@ var imports = require('node-import');
 
 module.expors = function(grunt) {
 	// Importing configs.
-	imports.module('./grunt-config/config.js', { loader: grunt });
+	var configs = imports.module('./grunt-config/config.js', { loader: grunt });
+	
+	// configs will contains variables from config.js, also from all imported scripts by config.js
+	console.log(configs.taskname);
+	console.log(configs.taskowner);
 };
 ```
 
 `grunt-config/config.js`
 
 ```js
+var taskname = 'Test';
+var taskowner = 'Also test';
+
 // Importing main config and tasks.
 '@import task-list.js`;
 
@@ -224,6 +234,7 @@ var foobar = 'Global foobar';
 `imports.module()` evaluate imported scripts in the NodeImport scope. So it's more safe, but limited to share objects since you need to define `params`.
 
 ## Release History
+* 2015-03-05        v0.5.0      "Fixing namespace and add return variables as object for imports.module()"
 * 2015-03-05        v0.4.1      "Fixing source-map sources url mistake."
 * 2015-03-05        v0.4.0      "Adding support to import scripts by call it inside a module."
 * 2015-03-05        v0.3.1      "Fixing namespace conflict when using null-extension."

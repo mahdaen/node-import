@@ -1,13 +1,7 @@
-'@import data/home.js';
-'@import data/about.js';
+var imports = require('../index.js');
 
-/* Test Global Var */
-console.log(title);
+module.exports = function() {
+    var result = imports.module('test/people', {}, true);
 
-/* Test private var */
-console.log(home.title, home.$name);
-console.log(about.title);
-
-/* Test Namespace Object */
-console.log(home);
-console.log(about);
+    console.dir(result);
+}

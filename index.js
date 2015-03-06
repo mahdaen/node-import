@@ -23,20 +23,48 @@ var Imports = function(source, options, verbose) {
     /* Multiple files import */
     else if ('object' == typeof source) {
         /* Creating scripts holder */
-        var scripts = '';
+        var scripts = '', result;
 
         /* Files in array */
         if (Array.isArray(source)) {
-            source.forEach(function(file) {
-                scripts += imports(file, options, verbose);
+            source.forEach(function(file, i) {
+                var scr = imports(file, options, verbose);
+
+                if (scr) {
+                    scripts += scr.text;
+
+                    if (i == 0) {
+                        result = scr;
+                    }
+                }
             });
+
+            if (result) {
+                return result;
+            }
         }
 
         /* Files in object */
         else {
+            var start = 0;
+
             source.forEach(function(file, options) {
-                scripts += imports(file, options, verbose);
+                var scr = imports(file, options, verbose);
+
+                if (scr) {
+                    scripts += scr.text;
+
+                    if (start == 0) {
+                        result = scr;
+                    }
+                }
+
+                start++;
             });
+
+            if (result) {
+                return result;
+            }
         }
     }
 }
@@ -55,6 +83,68 @@ Imports.module = function(source, params, verbose) {
 
     if (script) {
         eval(script.get());
+
+        var text = script.text, exports = {};
+
+        /* Getting global variable lists */
+        var txsplit = text.split(/[\r\n]+/), variables = [];
+
+        txsplit.forEach(function(line) {
+            var hasvar = line.match(/^var\s+[a-zA-Z\d\_\$]+\s?\=/g);
+
+            if (hasvar) {
+                hasvar.forEach(function(vars) {
+                    variables.push(vars);
+                });
+
+                var invar = line.match(/\,\s+[a-zA-Z\d\_\$]+\s?\=/g);
+
+                if (invar) {
+                    invar.forEach(function(vars) {
+                        variables.push(vars);
+                    });
+                }
+            }
+
+            else {
+                hasvar = line.match(/^[a-zA-Z\d\_\$]+\s?\=/g);
+
+                if (hasvar) {
+                    hasvar.forEach(function(vars) {
+                        variables.push(vars);
+                    });
+
+                    var invar = line.match(/\,\s+[a-zA-Z\d\_\$]+\s?\=/g);
+
+                    if (invar) {
+                        invar.forEach(function(vars) {
+                            variables.push(vars);
+                        });
+                    }
+                }
+            }
+        });
+
+        variables.forEach(function(vars) {
+
+        });
+
+        if (variables) {
+            /* Registering global variables */
+            variables.forEach(function (vars) {
+                vars = vars.replace(/var?\s+/, '').replace(/\s+\=/, '').replace(/\s+/g, '').replace(/\n/g, '').replace(/,/g, '');
+
+                if (verbose) {
+                    console.log(cl.green('Registering exportable variable ') + cl.cyan.bold(vars));
+                }
+
+                try {
+                    eval('exports["' + vars  +'"] = ' + vars + ';');
+                } catch (err) {}
+            });
+
+            return exports;
+        }
     }
 
     return script;
@@ -69,6 +159,58 @@ var imports = function(source, options, verbose) {
     if ('string' === typeof source) {
         /* Get start time */
         var pfstart = new Date().getTime();
+
+        /* v0.4.2 - Trying to resolve file */
+        if (!fs.existsSync('./' + source)) {
+            /* Log in verbose */
+            if (verbose) {
+                console.log(cl.magenta.bold.italic('Can\'t resolve ')
+                + cl.yellow.bold(source));
+
+                console.log(cl.blue.bold.italic('Searching ')
+                + cl.yellow.bold(source + '*'));
+            }
+
+            var find = gl.sync(source + '*');
+
+            if (find && find.length > 0) {
+                var flist = '';
+
+                find.forEach(function(file, i) {
+                    flist += file + (i < flist.length ? ', ' : '');
+                });
+
+                if (verbose) {
+                    console.log(cl.blue.bold.italic('Found ') + cl.yellow.bold(flist));
+                }
+
+                if (find.length == 1) {
+                    return imports(find[0], options, verbose);
+                }
+
+                else if (find.length > 1) {
+                    var scripts = '', result;
+
+                    find.forEach(function(file, i) {
+                        var scr = imports(file, options, verbose);
+
+                        if (scr) {
+                            scripts += scr.text;
+
+                            if (i == 0) {
+                                result = scr;
+                            }
+                        }
+                    });
+
+                    if (result) {
+                        result.text = scripts;
+
+                        return result;
+                    }
+                }
+            }
+        }
 
         /* Ensure no error when options undefined */
         options = !options ? {} : options;
@@ -214,7 +356,7 @@ InlineScript.prototype = {
 
         /* Log in verbose */
         if (this.verbose) {
-            console.log(cl.cyan.bold.italic('@import') + ': ' + cl.yellow(this.cwds.get().replace(this.cwds.cwds, '') + '/' + this.filename));
+            console.log(cl.cyan.bold.italic('@import') + ': ' + cl.yellow.bold(this.cwds.get().replace(this.cwds.cwds, '') + '/' + this.filename));
         }
 
         /* Reading Script File */
@@ -271,30 +413,48 @@ InlineScript.prototype = {
                 /* Copying script text */
                 var text = $this.text;
 
-                /* Getting Function blocks to escape local variables */
-                var fnblock = text.match(fnbRegEx);
-
-                if (fnblock) {
-                    /* Removing function blocks in temporary script to prevent capturing local variables */
-                    fnblock.forEach(function(fnstring) {
-                        text = text.replace(fnstring, '');
-                    });
-                }
-
                 /* Getting global variable lists */
-                var vrtb = text.match(/[\n\,\s]+[a-zA-Z\d\_\$]+\s?\=/g);
+                var txsplit = text.split(/[\r\n]+/), variables = [];
 
-                if (vrtb) {
-                    var vrta = text.match(/var\s+[a-zA-Z\d\_\$]+\s?\=/g);
+                txsplit.forEach(function(line) {
+                    var hasvar = line.match(/^var\s+[a-zA-Z\d\_\$]+\s?\=/g);
 
-                    if (vrta) {
-                        vrtb.concat(vrta);
+                    if (hasvar) {
+                        hasvar.forEach(function(vars) {
+                            variables.push(vars);
+                        });
+
+                        var invar = line.match(/\,\s+[a-zA-Z\d\_\$]+\s?\=/g);
+
+                        if (invar) {
+                            invar.forEach(function(vars) {
+                                variables.push(vars);
+                            });
+                        }
                     }
-                }
 
-                if (vrtb) {
+                    else {
+                        hasvar = line.match(/^[a-zA-Z\d\_\$]+\s?\=/g);
+
+                        if (hasvar) {
+                            hasvar.forEach(function(vars) {
+                                variables.push(vars);
+                            });
+
+                            var invar = line.match(/\,\s+[a-zA-Z\d\_\$]+\s?\=/g);
+
+                            if (invar) {
+                                invar.forEach(function(vars) {
+                                    variables.push(vars);
+                                });
+                            }
+                        }
+                    }
+                });
+
+                if (variables) {
                     /* Registering global variables */
-                    vrtb.forEach(function (vars) {
+                    variables.forEach(function (vars) {
                         vars = vars.replace(/var?\s+/, '').replace(/\s+\=/, '').replace(/\s+/g, '').replace(/\n/g, '').replace(/,/g, '');
 
                         if ($this.verbose) {
@@ -530,4 +690,4 @@ $.Namespace.prototype = {
 }
 
 /* Namespace Constructor */
-var nspcons = "var _GLB = 'undefined' != typeof global ? global : window; if (!_GLB.Namespace) {_GLB.Namespace = function(name) {if (typeof name === 'string') {this.constructor.name = name;}return this;};_GLB.Namespace.prototype = {push: function(obj) {var $namespace = this;if (typeof obj === 'object' && !obj.length) {for (var key in obj) {if (obj.hasOwnProperty(key)) {$namespace[key] = obj[key];}}}return this;},}}\n\n";
+var nspcons = "var _GLB = 'undefined' != typeof global ? global : window; if (!_GLB.Namespace) {_GLB.Namespace = function(name) {if (typeof name === 'string') {this.constructor.name = name;}return this;};_GLB.Namespace.prototype = {push: function(obj) {var $namespace = this;if (typeof obj === 'object' && !obj.length) {for (var key in obj) {if (obj.hasOwnProperty(key)) { $namespace[key] = obj[key]; }}}return this;},}}\n\n";

@@ -1,44 +1,7 @@
-// NAMESPACE START  --------------------
-var home = new Namespace('home');
+var _GLB = 'undefined' != typeof global ? global : window; if (!_GLB.Namespace) {_GLB.Namespace = function(name) {if (typeof name === 'string') {this.constructor.name = name;}return this;};_GLB.Namespace.prototype = {push: function(obj) {var $namespace = this;if (typeof obj === 'object' && !obj.length) {for (var key in obj) {if (obj.hasOwnProperty(key)) {$namespace[key] = obj[key];}}}return this;},}}
 
-title = 'Homepage';
-subtitle = 'This is a homepage';
-$name = 'Nanang Mahdaen El Agung';
+var imports = require('node-import');
 
-if ($name === 'Nanang Mahdaen El Agung') {
-    $name = 'John Smith';
+module.exports = function () {
+    imports.module('people');
 }
-
-var a = 1, b = 2;
-
-var w = (a == 1 ? 10 : 12);
-
-home.push({ title: title, subtitle: subtitle, $name: $name, $name: $name, a: a, b: b, w: w, });
-// NAMESPACE END    --------------------
-
-// NAMESPACE START  --------------------
-var about = new Namespace('about');
-
-title = 'About Page';
-subtitle = 'This is a About Page';
-
-var overview = {
-    a: 1,
-    b: 2,
-    c: 3
-};
-
-about.push({ title: title, subtitle: subtitle, overview: overview, });
-// NAMESPACE END    --------------------
-
-
-/* Test Global Var */
-console.log(title);
-
-/* Test private var */
-console.log(home.title, home.$name);
-console.log(about.title);
-
-/* Test Namespace Object */
-console.log(home);
-console.log(about);
