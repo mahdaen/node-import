@@ -2,7 +2,7 @@ Node Import
 ===========
 Imports dependencies and run it directly (sync/async) or concatenate them and exports to file.
 
-### **Why?**
+## **Why?**
 ***
 
 Before I write this, I just think if I can concatenate my scripts with direct import in each file.
@@ -19,7 +19,15 @@ to ensure each files can communicate with each others, including the global vari
 Now, you can export the scripts and run it in browser. I mean if you only need to concatenate files
 and minify them but still needs namespace for each file. ;)
 
-### **Installation**
+
+## **Modules**
+***
+
+- `imports()` - Import scripts and run in global context (evaluated scripts will available on all modules) or export to file.
+- `imports.module()` - Import scripts and use it inside `module.expors = `. Script will evaulated after module called.
+- `include()` - Forwrad `require()` to lookup to all folder, not only inside `node_modules`.
+
+## **Installation**
 ***
 
 ```
@@ -27,11 +35,47 @@ npm install --save node-import
 ```
 
 To use the CLI support, install it globally.
+
 ```
 npm install -g node-import
 ```
 
-### **Usage**
+After installing the module, import the module in the main file of your script. Module will available in `global` object.
+Example:
+
+`index.js`
+
+```js
+require('node-import');
+
+imports('subdir/file.js');
+imports('subdir/another');
+```
+
+## **Include**
+***
+
+`include()` is forwarder for `require()`. Since `require()` only lookup inside `node_modules` folder for simple require,
+`include()` will help require to lookup to other location. By default the directory for lookup is `./` or root of project.
+You can define the default location by using `include.location(DIR)`.
+ 
+#### Example
+ 
+* root
+	 - people
+	    - index.js
+	 - team
+	    - team.js
+	 - index.js
+ 
+```js
+var people = include('people');     // Valid
+var team = include('team');         // Valid
+var index = include('index');       // Valid
+ 
+```
+
+## **Import/Export Usage**
 ### NodeJS
 ***
 
@@ -186,7 +230,7 @@ var libA = 'Foo is bar foobar';
 '@import libs/lib.config';
 ```
 
-### **Namespace**
+## **Namespace**
 Namespace provide ability to keep the global variables of file is not overwritten by other references.
 Namespace is limited. It's only read `global` variables and should started with new line. E.g
 
@@ -233,7 +277,28 @@ var foobar = 'Global foobar';
 `imports()` is flexible but always evaluate the imported scripts in the `global` context. Be carefull with a words `eval is evil` ;P
 `imports.module()` evaluate imported scripts in the NodeImport scope. So it's more safe, but limited to share objects since you need to define `params`.
 
+More examples available in `test/` folder. To test it, install the module, cd to the module folder and run `npm test`
+
+## **Limitation**
+***
+
+* Currently we don't support importing minified javascripts.
+* Namespace only read global variables in imported scripts.
+* `imports()` run script in `global` context.
+* `imports.module()` only share variable in the import result.
+* `include()` is just like `require()`, no sharable object in the result.
+
+## TODO
+***
+
+* Create CLI command `node-import install` to install NPM Packages into any folder, not only `node_modules`. Also `node-import update`.
+* Provide support to `imports()` to lookup in default `include` folder.
+* Configurations of `imports` and `include` will read the config in file `imports.json`.
+
 ## Release History
+***
+
+* 2015-03-08        v0.6.0      "Adding include() module"
 * 2015-03-05        v0.5.0      "Fixing namespace and add return variables as object for imports.module()"
 * 2015-03-05        v0.4.1      "Fixing source-map sources url mistake."
 * 2015-03-05        v0.4.0      "Adding support to import scripts by call it inside a module."

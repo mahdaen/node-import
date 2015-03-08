@@ -84,7 +84,7 @@ Imports.module = function(source, params, verbose) {
     if (script) {
         eval(script.get());
 
-        var text = script.text, exports = {};
+        var text = script.text, exports = new Namespace('node-import');
 
         /* Getting global variable lists */
         var txsplit = text.split(/[\r\n]+/), variables = [];
@@ -125,10 +125,6 @@ Imports.module = function(source, params, verbose) {
             }
         });
 
-        variables.forEach(function(vars) {
-
-        });
-
         if (variables) {
             /* Registering global variables */
             variables.forEach(function (vars) {
@@ -150,7 +146,14 @@ Imports.module = function(source, params, verbose) {
     return script;
 };
 
+/* Exporting As Module */
 module.exports = Imports;
+
+/* Trying to attach imports in global scope */
+if ('undefined' !== typeof global) {
+    global.imports = Imports;
+}
+
 
 /* Script Importer */
 var imports = function(source, options, verbose) {
@@ -223,7 +226,7 @@ var imports = function(source, options, verbose) {
             export: options.export === undefined ? false : options.export,
             exportDir: options.exportDir || pc.cwd() + '/' + pt.dirname(source) + '/export',
             exportMin: options.exportMin === undefined ? true : options.exportMin,
-            exportMap: options.exportMap === undefined ? false : options.exportMap,
+            exportMap: options.exportMap === undefined ? true : options.exportMap,
             exportOptions: options.exportOptions || undefined
         }
 
@@ -674,20 +677,124 @@ $.Namespace = function(name) {
 }
 
 $.Namespace.prototype = {
-    push: function(obj) {
+    push: function(name, obj) {
         var $namespace = this;
 
-        if (typeof obj === 'object' && !obj.length) {
-            for (var key in obj) {
-                if (obj.hasOwnProperty(key)) {
-                    $namespace[key] = obj[key];
+        if ('string' === typeof name && 'undefined' !== typeof obj) {
+            this[name] = obj;
+        }
+
+        else if ('object' === typeof name && !name.length) {
+            for (var key in name) {
+                if (name.hasOwnProperty(key)) {
+                    $namespace[key] = name[key];
                 }
             }
         }
 
         return this;
     },
+
+    json: function() {
+        return JSON.stringify(this);
+    }
 }
 
 /* Namespace Constructor */
 var nspcons = "var _GLB = 'undefined' != typeof global ? global : window; if (!_GLB.Namespace) {_GLB.Namespace = function(name) {if (typeof name === 'string') {this.constructor.name = name;}return this;};_GLB.Namespace.prototype = {push: function(obj) {var $namespace = this;if (typeof obj === 'object' && !obj.length) {for (var key in obj) {if (obj.hasOwnProperty(key)) { $namespace[key] = obj[key]; }}}return this;},}}\n\n";
+
+
+/* Simple Include */
+var IncConfig = {
+    defpath: './',
+    verbose: false
+};
+
+/* Resolver */
+var resolve = function(path) {
+    if (IncConfig.verbose) { console.log(cl.cyan.bold('Searching ') + cl.yellow.bold(path)); }
+
+    var regsearch = gl.sync(path);
+
+    if (regsearch && regsearch.length > 0) {
+        if (IncConfig.verbose) { console.log(cl.cyan.bold('Including ') + cl.yellow.bold(regsearch[0])); }
+
+        return regsearch[0];
+    }
+
+    else {
+        if (IncConfig.verbose) { console.log(cl.red.bold('Not Found ') + cl.yellow.bold(path)); }
+
+        return false;
+    }
+}
+
+/* Forwarder */
+var Include = function(file) {
+    var path = IncConfig.defpath + '/' + file, result;
+
+    if (IncConfig.verbose) { console.log(cl.cyan.bold('Including ') + cl.yellow.bold(path)); }
+
+    try {
+        return require(IncConfig.defpath + '/' + file);
+    } catch (err) {
+        if (IncConfig.verbose) { console.log(cl.red.bold('Not Found ') + cl.yellow.bold(path)); }
+
+        path = IncConfig.defpath + '/' + file.replace(/\/$/, '') + '/' + 'index.js';
+
+        var exist = resolve(path);
+
+        if (exist) {
+            return require(exist);
+        } else {
+            path = IncConfig.defpath + '/**/' + file.replace(/\/$/, '') + '/' + file + '.js';
+
+            exist = resolve(path);
+
+            if (exist) {
+                return require(exist);
+            } else {
+                path = IncConfig.defpath + '/**/' + file + '*.js';
+
+                exist = resolve(path);
+
+                if (exist) {
+                    return require(exist);
+                } else {
+                    path = IncConfig.defpath + '/**/' + file;
+
+                    exist = resolve(path);
+
+                    if (exist) {
+                        return require(exist);
+                    } else {
+                        var error = cl.red.bold('Unable to find module ') + cl.yellow.bold(file);
+
+                        throw error;
+                    }
+                }
+            }
+        }
+    }
+}
+
+/* Setting Include Location */
+Include.location = function(url) {
+    if (fs.existsSync(url)) {
+        IncConfig.defpath = url.replace(/\/$/, '');
+    }
+
+    return Include;
+}
+
+/* Setting Verbose Include */
+Include.verbose = function(bool) {
+    IncConfig.verbose = bool;
+
+    return Include;
+}
+
+/* Export to global object */
+if ('undefined' != typeof global) {
+    global.include = Include;
+}
