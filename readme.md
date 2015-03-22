@@ -64,7 +64,8 @@ imports('bar/main');
 
 Include **`modules`** from outside **`node_modules`** folder. Since the default **`require()`** is only 
 access the **`node_modules`** folder, **`include()`** will help us to require modules or json from any folder.
-It's works like **`require()`**.
+It's works like **`require()`**. You can install NPM Packages outside of **`node_modules`** folder by
+using **`node-import -i`**.
 
 **Usage**
 ```javascript
@@ -450,13 +451,6 @@ To test it, install the module, cd to the module folder and run **`npm test`**
 * `imports()` run script in `global` context.
 * `imports.module()` only share variable in the import result.
 * `include()` is just like `require()`, no sharable object in the result.
-
-***
-### **`TODO`**
-
-* Create CLI command `node-import install` to install NPM Packages into any folder, not only `node_modules`. Also `node-import update`.
-* Provide support to `imports()` to lookup in default `include` folder.
-* Configurations of `imports` and `include` will read the config in file `imports.json`.
 
 ***
 ### **`Release History`**
