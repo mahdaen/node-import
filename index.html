@@ -27,23 +27,16 @@
         </ul>
       </header>
       <section>
-        <h1>
-<a id="node-import" class="anchor" href="#node-import" aria-hidden="true"><span class="octicon octicon-link"></span></a>Node Import</h1>
-
-<p>Imports dependencies and run it directly (sync/async) or concatenate them and exports to file.</p>
-
-<h2>
-<a id="why" class="anchor" href="#why" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Why?</strong>
+        <h2>
+<a id="node-import" class="anchor" href="#node-import" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Node Import</strong>
 </h2>
-
-<hr>
 
 <p>Before I write this, I just think if I can concatenate my scripts with direct import in each file.
 But when I thinking how to do that, I think I need to create script that can concatenate and run it,
 as well supporting synchronus mode without headache.</p>
 
 <p>By default, imported scripts executed in synchronus mode, since for async purpose nodejs already have it,
-even we have <code>async</code> module.</p>
+even we have <strong><code>async</code></strong> module.</p>
 
 <p>We know that asynchronus evented I/O model is the benefits of nodejs. But sometimes, probably we need to runs
 synchronus scripts, especially when we create some modules and we need to separate the files but we need
@@ -52,24 +45,28 @@ to ensure each files can communicate with each others, including the global vari
 <p>Now, you can export the scripts and run it in browser. I mean if you only need to concatenate files
 and minify them but still needs namespace for each file. ;)</p>
 
-<h2>
-<a id="modules" class="anchor" href="#modules" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Modules</strong>
-</h2>
+<hr>
+
+<p><strong>Is it usefull?</strong></p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-c">// Import another files.</span>
+<span class="pl-s"><span class="pl-pds">'</span>@import foo.js<span class="pl-pds">'</span></span>;
+<span class="pl-s"><span class="pl-pds">'</span>@import config<span class="pl-pds">'</span></span>;
+
+<span class="pl-c">// Read variable from other files.</span>
+<span class="pl-en">console</span><span class="pl-c1">.log</span>(foo.<span class="pl-c1">title</span>);
+
+<span class="pl-c">// Create namespace.</span>
+<span class="pl-s"><span class="pl-pds">'</span>@namespace bar<span class="pl-pds">'</span></span>;
+
+<span class="pl-c">// This variable will available in the namespace =&gt; bar.tilte.</span>
+<span class="pl-k">var</span> title <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>Title of Bar<span class="pl-pds">'</span></span>;</pre></div>
 
 <hr>
 
-<ul>
-<li>
-<code>imports()</code> - Import scripts and run in global context (evaluated scripts will available on all modules) or export to file.</li>
-<li>
-<code>imports.module()</code> - Import scripts and use it inside <code>module.expors =</code>. Script will evaulated after module called.</li>
-<li>
-<code>include()</code> - Forwrad <code>require()</code> to lookup to all folder, not only inside <code>node_modules</code>.</li>
-</ul>
-
-<h2>
-<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Installation</strong>
-</h2>
+<h3>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong><code>Installation</code></strong>
+</h3>
 
 <hr>
 
@@ -81,181 +78,481 @@ and minify them but still needs namespace for each file. ;)</p>
 <pre><code>npm install -g node-import
 </code></pre>
 
-<p>After installing the module, import the module in the main file of your script. Module will available in <code>global</code> object.
-Example:</p>
-
-<p><code>index.js</code></p>
-
-<div class="highlight highlight-js"><pre><span class="pl-s3">require</span>(<span class="pl-s1"><span class="pl-pds">'</span>node-import<span class="pl-pds">'</span></span>);
-
-imports(<span class="pl-s1"><span class="pl-pds">'</span>subdir/file.js<span class="pl-pds">'</span></span>);
-imports(<span class="pl-s1"><span class="pl-pds">'</span>subdir/another<span class="pl-pds">'</span></span>);</pre></div>
-
-<h2>
-<a id="include" class="anchor" href="#include" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Include</strong>
-</h2>
-
 <hr>
 
-<p><code>include()</code> is forwarder for <code>require()</code>. Since <code>require()</code> only lookup inside <code>node_modules</code> folder for simple require,
-<code>include()</code> will help require to lookup to other location. By default the directory for lookup is <code>./</code> or root of project.
-You can define the default location by using <code>include.location(DIR)</code>.</p>
+<p>After installing the module, you can load the module in the main file of your script. Module will available in
+<strong><code>global</code></strong> object.</p>
 
-<h4>
-<a id="example" class="anchor" href="#example" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example</h4>
+<p><strong>Example</strong></p>
 
-<ul>
-<li>root
+<div class="highlight highlight-js"><pre><span class="pl-c">// Load node-import without wrapping to variable.</span>
+<span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>node-import<span class="pl-pds">'</span></span>);
 
-<ul>
-<li>people
+<span class="pl-c">// After node-import loaded, all methods will available in global scope.</span>
+include(<span class="pl-s"><span class="pl-pds">'</span>foo<span class="pl-pds">'</span></span>);
+imports(<span class="pl-s"><span class="pl-pds">'</span>bar/main<span class="pl-pds">'</span></span>);</pre></div>
 
-<ul>
-<li>index.js</li>
-</ul>
-</li>
-<li>team
-
-<ul>
-<li>team.js</li>
-</ul>
-</li>
-<li>index.js</li>
-</ul>
-</li>
-</ul>
-
-<div class="highlight highlight-js"><pre><span class="pl-s">var</span> people <span class="pl-k">=</span> include(<span class="pl-s1"><span class="pl-pds">'</span>people<span class="pl-pds">'</span></span>);     <span class="pl-c">// Valid</span>
-<span class="pl-s">var</span> team <span class="pl-k">=</span> include(<span class="pl-s1"><span class="pl-pds">'</span>team<span class="pl-pds">'</span></span>);         <span class="pl-c">// Valid</span>
-<span class="pl-s">var</span> index <span class="pl-k">=</span> include(<span class="pl-s1"><span class="pl-pds">'</span>index<span class="pl-pds">'</span></span>);       <span class="pl-c">// Valid</span>
-</pre></div>
-
-<h2>
-<a id="importexport-usage" class="anchor" href="#importexport-usage" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Import/Export Usage</strong>
-</h2>
+<hr>
 
 <h3>
-<a id="nodejs" class="anchor" href="#nodejs" aria-hidden="true"><span class="octicon octicon-link"></span></a>NodeJS</h3>
+<a id="include" class="anchor" href="#include" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong><code>include()</code></strong>
+</h3>
+
+<p>Include <strong><code>modules</code></strong> from outside <strong><code>node_modules</code></strong> folder. Since the default <strong><code>require()</code></strong> is only 
+access the <strong><code>node_modules</code></strong> folder, <strong><code>include()</code></strong> will help us to require modules or json from any folder.
+It's works like <strong><code>require()</code></strong>.</p>
+
+<p><strong>Usage</strong></p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-k">var</span> foo <span class="pl-k">=</span> include(SCRIPTS);</pre></div>
 
 <hr>
 
-<p><code>imports(files, [options (object)]);</code></p>
+<p><strong>Params</strong></p>
 
-<h5>
-<a id="options" class="anchor" href="#options" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>options</code>
-</h5>
+<table>
+<thead>
+<tr>
+<th><strong>Name</strong></th>
+<th><strong>Type</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SCRIPTS</td>
+<td><code>String</code></td>
+<td>String module name, folder name, or js/json filename.</td>
+</tr>
+</tbody>
+</table>
+
+<hr>
+
+<p><strong>Example</strong></p>
 
 <ul>
 <li>
-<code>exec</code> - Execute the imported scripts. Default <code>true</code>
+<strong>root</strong>
+
+<ul>
+<li>
+<strong>people</strong>
+
+<ul>
+<li><strong><code>index.js</code></strong></li>
+</ul>
 </li>
 <li>
-<code>async</code> - Execute the imported scripts in async mode. Default <code>false</code>
+<strong>team</strong>
+
+<ul>
+<li>
+<strong>support</strong>
+
+<ul>
+<li><strong><code>main.js</code></strong></li>
+<li><strong><code>package.json</code></strong></li>
+</ul>
 </li>
-<li>
-<code>export</code> - Export imported scripts to file. Default <code>false</code>
+<li><strong><code>team.js</code></strong></li>
+</ul>
 </li>
-<li>
-<code>exportDir</code> - Export location.</li>
-<li>
-<code>exportMin</code> - Include minified version when exporting. Default <code>true</code>
+<li><strong><code>index.js</code></strong></li>
+</ul>
 </li>
-<li>
-<code>exportMap</code> - Include sourcemap when uglifying. Default <code>true</code> <em>(not yet tested)</em>
-</li>
-<li>
-<code>RETURNS</code> - InlineScript object.</li>
 </ul>
 
-<div class="highlight highlight-js"><pre><span class="pl-s">var</span> imports <span class="pl-k">=</span> <span class="pl-s3">require</span>(<span class="pl-s1"><span class="pl-pds">'</span>node-import<span class="pl-pds">'</span></span>);
+<div class="highlight highlight-javascript"><pre><span class="pl-c">// Load the node-import first.</span>
+<span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>node-import<span class="pl-pds">'</span></span>);
 
-<span class="pl-c">// Just execute.</span>
-imports(<span class="pl-s1"><span class="pl-pds">'</span>./test.js<span class="pl-pds">'</span></span>);
+<span class="pl-c">// Include people.</span>
+<span class="pl-k">var</span> people <span class="pl-k">=</span> include(<span class="pl-s"><span class="pl-pds">'</span>people<span class="pl-pds">'</span></span>);     <span class="pl-c">// Valid</span>
 
-<span class="pl-c">// Execute and get the scripts.</span>
-<span class="pl-s">var</span> result <span class="pl-k">=</span> imports(<span class="pl-s1"><span class="pl-pds">'</span>./test.js<span class="pl-pds">'</span></span>);
+<span class="pl-c">// Equal with</span>
+<span class="pl-k">var</span> people <span class="pl-k">=</span> <span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>./people/index.js<span class="pl-pds">'</span></span>);
 
-<span class="pl-c">// Write out the result.</span>
-fs.writeFile(foofile, result.<span class="pl-sc">text</span>, fn);
+<span class="pl-c">// Other</span>
+<span class="pl-k">var</span> team <span class="pl-k">=</span> include(<span class="pl-s"><span class="pl-pds">'</span>team<span class="pl-pds">'</span></span>);         <span class="pl-c">// Valid</span>
+<span class="pl-k">var</span> index <span class="pl-k">=</span> include(<span class="pl-s"><span class="pl-pds">'</span>index<span class="pl-pds">'</span></span>);       <span class="pl-c">// Valid</span>
 
-<span class="pl-c">// Re-call the script.</span>
-result.run();
+<span class="pl-c">// Include package. It's valid with `main` property defined.</span>
+<span class="pl-k">var</span> support <span class="pl-k">=</span> include(<span class="pl-s"><span class="pl-pds">'</span>support<span class="pl-pds">'</span></span>);   <span class="pl-c">// In package.json, `main` property referenced to `main.js`</span></pre></div>
+
+<hr>
+
+<h3>
+<a id="imports" class="anchor" href="#imports" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong><code>imports()</code></strong>
+</h3>
+
+<p>Import/Export scripts.
+You can load scripts from file and run it to global scope.
+All variables in the scripts will available to another scripts.
+Imports will always run the scripts in global scope, so using it in the <strong><code>module.exports =</code></strong> block sometimes will not works properly.
+NodeImport provide <strong><code>$root</code></strong> pattern to add root folder to the filename.</p>
+
+<p><strong>Usage</strong></p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-k">var</span> script <span class="pl-k">=</span> imports(FILES, OPTIONS);</pre></div>
+
+<p><strong>Returns: <code>script object</code></strong></p>
+
+<hr>
+
+<p><strong>Params</strong></p>
+
+<table>
+<thead>
+<tr>
+<th><strong>Name</strong></th>
+<th><strong>Type</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FILES</td>
+<td>
+<code>String</code> or <code>Array</code>
+</td>
+<td>Script filename or array filename lists. You can ignore the file extension. Add <code>$root</code> in the filename as root folder.</td>
+</tr>
+<tr>
+<td>OPTIONS <code>optional</code>
+</td>
+<td><code>Object</code></td>
+<td>Object contains the import options.</td>
+</tr>
+</tbody>
+</table>
+
+<hr>
+
+<p><strong>Options</strong></p>
+
+<p>Remember, options name is case-sencitive.</p>
+
+<table>
+<thead>
+<tr>
+<th><strong>Name</strong></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>exec</td>
+<td><code>Boolean</code></td>
+<td><code>true</code></td>
+<td>Run the imported scripts or not.</td>
+</tr>
+<tr>
+<td>async</td>
+<td><code>Boolean</code></td>
+<td><code>false</code></td>
+<td>Run the imported scripts in <code>async</code> mode or not.</td>
+</tr>
+<tr>
+<td>export</td>
+<td><code>Boolean</code></td>
+<td><code>false</code></td>
+<td>Export the imported scripts to file or not.</td>
+</tr>
+<tr>
+<td>exportDir</td>
+<td><code>String</code></td>
+<td><code>null</code></td>
+<td>Folder location to save the imported scripts.</td>
+</tr>
+<tr>
+<td>exportMin</td>
+<td><code>Boolean</code></td>
+<td><code>true</code></td>
+<td>Also save the minified version when exporting scripts.</td>
+</tr>
+<tr>
+<td>exportMap</td>
+<td><code>Boolean</code></td>
+<td><code>true</code></td>
+<td>Also save the sourcemap file when exporting scripts.</td>
+</tr>
+</tbody>
+</table>
+
+<hr>
+
+<p><strong>Example</strong></p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-c">// Load the node-import first.</span>
+<span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>node-import<span class="pl-pds">'</span></span>);
+
+<span class="pl-c">// Imports foo.js file and run it.</span>
+<span class="pl-k">var</span> foo <span class="pl-k">=</span> imports(<span class="pl-s"><span class="pl-pds">'</span>foo/main<span class="pl-pds">'</span></span>);
+
+<span class="pl-c">// Re-run the imported scripts.</span>
+foo.run();
+
+<span class="pl-c">// Print the imported scripts.</span>
+<span class="pl-en">console</span><span class="pl-c1">.log</span>(foo.<span class="pl-c1">text</span>);
 
 <span class="pl-c">// Only export the scripts.</span>
-imports(<span class="pl-s1"><span class="pl-pds">'</span>./test.js<span class="pl-pds">'</span></span>, { exec<span class="pl-k">:</span> <span class="pl-c1">false</span>, export<span class="pl-k">:</span> <span class="pl-c1">true</span>, exportDir<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">'</span>./test/out<span class="pl-pds">'</span></span> });</pre></div>
-
-<h3>
-<a id="nodejs---in-module" class="anchor" href="#nodejs---in-module" aria-hidden="true"><span class="octicon octicon-link"></span></a>NodeJS - In Module</h3>
+imports(<span class="pl-s"><span class="pl-pds">'</span>foo/extra<span class="pl-pds">'</span></span>, { exec<span class="pl-k">:</span> <span class="pl-c1">false</span>, export<span class="pl-k">:</span> <span class="pl-c1">true</span>, exportDir<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">'</span>test/out<span class="pl-pds">'</span></span> });</pre></div>
 
 <hr>
 
-<p><code>imports.module(files, [params { wrap: origin }], verbose);</code></p>
+<h3>
+<a id="importsmodule" class="anchor" href="#importsmodule" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong><code>imports.module()</code></strong>
+</h3>
 
-<p>The difference between <code>imports()</code> and <code>imports.module()</code> is how script loaded.
-<code>imports()</code> will evaluate the scripts directly, while <code>imports.module()</code> is load the scripts but evaluated by module call.</p>
+<p>Import scripts inside <strong><code>module.exports</code></strong> block. The difference with <strong><code>imports()</code></strong> is the scripts will be
+evaluated when the module is used. While <strong><code>imports()</code></strong> is evaluated directly into global scope.</p>
 
-<p><code>imports.module()</code> also returns <code>object</code> contains all global variables in the imported scripts.
-Like <code>require</code>, but <code>imports.module()</code> will export all variables, not only object in <code>module.exports</code>.</p>
+<p>Imported scripts using <strong><code>import.module()</code></strong> will be evaluated in the <strong><code>node-import</code></strong> scope, so it's safe.
+The benefit is the result will contains all global variables in the imported scripts. While <strong><code>require()</code></strong> will only
+contains exported module.</p>
 
-<p>E.g: <code>var mod = require('some-module');</code>. <code>imports()</code> inside <code>some-module</code> will evaluated directly as soon as module laoded.
-While <code>imports.module()</code> will evaluated when <code>mod()</code> is called.</p>
+<p><strong>Usage</strong></p>
 
-<h5>
-<a id="details" class="anchor" href="#details" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>Details</code>
-</h5>
+<div class="highlight highlight-javascript"><pre><span class="pl-k">var</span> result <span class="pl-k">=</span> imports(FILES, SHARED_VARIABLES);</pre></div>
 
-<ul>
-<li>
-<code>files</code> - Files to import. E.g: <code>source/main.js</code>.</li>
-<li>
-<code>params</code> - Object contains paramaters to share with imported scripts. <code>wrap</code> is variable name to be used, origin is the original object.</li>
-<li>
-<code>verbose</code> - Show detailed logs.</li>
-<li>
-<code>RETURNS</code> - Object contains variables.</li>
-</ul>
+<hr>
 
-<h5>
-<a id="example-in-gruntfilejs" class="anchor" href="#example-in-gruntfilejs" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example in <code>Gruntfile.js</code>
-</h5>
+<p><strong>Params</strong></p>
 
-<div class="highlight highlight-js"><pre><span class="pl-s">var</span> imports <span class="pl-k">=</span> <span class="pl-s3">require</span>(<span class="pl-s1"><span class="pl-pds">'</span>node-import<span class="pl-pds">'</span></span>);
+<table>
+<thead>
+<tr>
+<th><strong>Name</strong></th>
+<th><strong>Type</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FILES</td>
+<td>
+<code>String</code> or <code>Array</code>
+</td>
+<td>Script filename or array filename lists. You can ignore the file extension.</td>
+</tr>
+<tr>
+<td>SHARED_VARIABLES <code>optional</code>
+</td>
+<td><code>Object</code></td>
+<td>Object contains variables to share with imported scripts.</td>
+</tr>
+</tbody>
+</table>
 
-<span class="pl-s3">module</span>.<span class="pl-en">expors</span> <span class="pl-k">=</span> <span class="pl-st">function</span>(<span class="pl-vpf">grunt</span>) {
-    <span class="pl-c">// Importing configs.</span>
-    <span class="pl-s">var</span> configs <span class="pl-k">=</span> imports.module(<span class="pl-s1"><span class="pl-pds">'</span>./grunt-config/config.js<span class="pl-pds">'</span></span>, { loader<span class="pl-k">:</span> grunt });
+<hr>
 
-    <span class="pl-c">// configs will contains variables from config.js, also from all imported scripts by config.js</span>
-    <span class="pl-en">console</span><span class="pl-s3">.log</span>(configs.taskname);
-    <span class="pl-en">console</span><span class="pl-s3">.log</span>(configs.taskowner);
+<p><strong>Example</strong></p>
+
+<div class="highlight highlight-js"><pre><span class="pl-c">// Load node-import first.</span>
+<span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>node-import<span class="pl-pds">'</span></span>);
+
+<span class="pl-c1">module</span>.<span class="pl-en">expors</span> <span class="pl-k">=</span> <span class="pl-k">function</span>(<span class="pl-smi">param</span>) {
+    <span class="pl-c">// Importing foo.js and share parameters with imported scripts.</span>
+    <span class="pl-k">var</span> foo <span class="pl-k">=</span> imports.module(<span class="pl-s"><span class="pl-pds">'</span>foo/main<span class="pl-pds">'</span></span>, { shared<span class="pl-k">:</span> param });
+
+    <span class="pl-c">// foo contains the global variables from foo.js</span>
+    <span class="pl-en">console</span><span class="pl-c1">.log</span>(foo.<span class="pl-c1">title</span>);
+    <span class="pl-en">console</span><span class="pl-c1">.log</span>(foo.<span class="pl-c1">description</span>);
 };</pre></div>
 
-<p><code>grunt-config/config.js</code></p>
+<p><strong><code>foo/main.js</code></strong></p>
 
-<div class="highlight highlight-js"><pre><span class="pl-s">var</span> taskname <span class="pl-k">=</span> <span class="pl-s1"><span class="pl-pds">'</span>Test<span class="pl-pds">'</span></span>;
-<span class="pl-s">var</span> taskowner <span class="pl-k">=</span> <span class="pl-s1"><span class="pl-pds">'</span>Also test<span class="pl-pds">'</span></span>;
+<div class="highlight highlight-js"><pre><span class="pl-c">// Create variables to share to result.</span>
+<span class="pl-k">var</span> title <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>Foo title<span class="pl-pds">'</span></span>;
+<span class="pl-k">var</span> description <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>The foo is a non-bar string and always be foo<span class="pl-pds">'</span></span>;
 
-<span class="pl-c">// Importing main config and tasks.</span>
-<span class="pl-s1"><span class="pl-pds">'</span>@import task-list.js`;</span>
-<span class="pl-s1"></span>
-<span class="pl-s1">// Initializing grunt.</span>
-<span class="pl-s1">// "loader" is equal to "grunt" since it<span class="pl-pds">'</span></span>s shared by importer above.
-<span class="pl-c">// "config" is namespace from "task-list.js"</span>
-loader.initConfig(config);
-
-<span class="pl-c">// Importing task loader.</span>
-<span class="pl-s1"><span class="pl-pds">'</span>@import task-loader.js`;</span></pre></div>
-
-<h3>
-<a id="cli" class="anchor" href="#cli" aria-hidden="true"><span class="octicon octicon-link"></span></a>CLI</h3>
+<span class="pl-c">// Read the shared variables from the importer.</span>
+<span class="pl-en">console</span><span class="pl-c1">.log</span>(shared);</pre></div>
 
 <hr>
 
-<p><code>node-import [options] [file ..]</code></p>
+<h3>
+<a id="import" class="anchor" href="#import" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong><code>@import</code></strong>
+</h3>
 
-<h5>
-<a id="options-1" class="anchor" href="#options-1" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>options</code>
-</h5>
+<p>This is pattern to import another scripts and require to be loaded by <strong><code>imports()</code></strong> or <strong><code>imports.module()</code></strong>.
+The pattern options will follow the <strong><code>imports()</code></strong> or <strong><code>imports.module()</code></strong> options.</p>
+
+<p><strong>Usage</strong></p>
+
+<p>The pattern must be defined using string. Like when we use <strong><code>'use strict';</code></strong>.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-s"><span class="pl-pds">'</span>@import [FILES ...]<span class="pl-pds">'</span></span>;
+
+<span class="pl-c">// Do something with imported scripts.</span></pre></div>
+
+<hr>
+
+<p><strong>Params</strong></p>
+
+<table>
+<thead>
+<tr>
+<th><strong>Name</strong></th>
+<th><strong>Type</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FILES</td>
+<td><code>String</code></td>
+<td>File name with extension, file name without extension, folder name or comma separated file names.</td>
+</tr>
+</tbody>
+</table>
+
+<hr>
+
+<p><strong>Example</strong></p>
+
+<p><strong><code>test.js</code></strong></p>
+
+<div class="highlight highlight-js"><pre><span class="pl-c">// Load node-import first.</span>
+<span class="pl-c1">require</span>(<span class="pl-s"><span class="pl-pds">'</span>node-import<span class="pl-pds">'</span></span>);
+
+<span class="pl-c">// Importing importing lib-a.js using imports() since pattern wont works without this importer in the main script.</span>
+imports(<span class="pl-s"><span class="pl-pds">'</span>libs/lib-a<span class="pl-pds">'</span></span>);
+
+<span class="pl-c">// Access the variables from imported scripts.</span>
+<span class="pl-en">console</span><span class="pl-c1">.log</span>(title); <span class="pl-c">// &gt; Title from lib-a.js</span>
+<span class="pl-en">console</span><span class="pl-c1">.log</span>(description); <span class="pl-c">// &gt; Description from lib-a.js</span>
+
+<span class="pl-c">// Replace the title</span>
+title <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>Replaced title<span class="pl-pds">'</span></span>;
+
+<span class="pl-c">// Print the title</span>
+<span class="pl-en">console</span><span class="pl-c1">.log</span>(title); <span class="pl-c">// &gt; Replaced title</span></pre></div>
+
+<p><strong><code>libs/lib-a.js</code></strong></p>
+
+<div class="highlight highlight-js"><pre><span class="pl-c">// Import another file at begining.</span>
+<span class="pl-s"><span class="pl-pds">'</span>@import lib-b.js<span class="pl-pds">'</span></span>;
+
+<span class="pl-c">// Create variables to share it.</span>
+<span class="pl-k">var</span> title <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>Title from lib-a.js<span class="pl-pds">'</span></span>;
+<span class="pl-k">var</span> description <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>Description from lib-a.js<span class="pl-pds">'</span></span>;
+
+<span class="pl-c">// Import is not always at begining, and relative to the last working directory.</span>
+<span class="pl-s"><span class="pl-pds">'</span>@import lib-c.js<span class="pl-pds">'</span></span>;
+
+<span class="pl-c">// Imports multiple files with comma separated.</span>
+<span class="pl-s"><span class="pl-pds">'</span>@import libs/lib-d.js, libs/lib-e.js<span class="pl-pds">'</span></span>;
+
+<span class="pl-c">// Import without file extension.</span>
+<span class="pl-s"><span class="pl-pds">'</span>@import libs/code<span class="pl-pds">'</span></span>; <span class="pl-c">// If folder contains code.a.js or code.b.js it's will be imported as well.</span>
+
+<span class="pl-c">// Import all files inside folder. *.js is important!</span>
+<span class="pl-s"><span class="pl-pds">'</span>@import libs/configs/*.js<span class="pl-pds">'</span></span>;</pre></div>
+
+<hr>
+
+<h3>
+<a id="namespace" class="anchor" href="#namespace" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong><code>@namespace</code></strong>
+</h3>
+
+<p>Namespace is pattern to makes the variables in the imported file will available as <strong><code>public</code></strong> and <strong><code>private</code></strong>.
+It's mean when you have variables with same name, variable inside the namespace will not replaced by next changes.</p>
+
+<p><strong>Usage</strong></p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-s"><span class="pl-pds">'</span>@namespace NAME<span class="pl-pds">'</span></span>;
+
+<span class="pl-c">// Do anythings.</span></pre></div>
+
+<hr>
+
+<p><strong>Params</strong></p>
+
+<table>
+<thead>
+<tr>
+<th><strong>Name</strong></th>
+<th><strong>Type</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NAME</td>
+<td><code>String</code></td>
+<td>Namespace name. It's will be used when you access the namespace.</td>
+</tr>
+</tbody>
+</table>
+
+<hr>
+
+<p><strong>Example</strong></p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-c">// Importing namespaces.</span>
+<span class="pl-s"><span class="pl-pds">'</span>@import foo<span class="pl-pds">'</span></span>;
+<span class="pl-s"><span class="pl-pds">'</span>@import bar<span class="pl-pds">'</span></span>;
+
+<span class="pl-c">// The public title is title of bar since title from foo is replaced by title from bar.</span>
+<span class="pl-en">console</span><span class="pl-c1">.log</span>(title); <span class="pl-c">// &gt; Title of Bar.</span>
+
+<span class="pl-c">// Print the title of foo. Since it's in namespace, it wont be replaced by title from bar.</span>
+<span class="pl-en">console</span><span class="pl-c1">.log</span>(foo.<span class="pl-c1">title</span>); <span class="pl-c">// Title of Foo</span>
+
+<span class="pl-c">// Print the title of bar.</span>
+<span class="pl-en">console</span><span class="pl-c1">.log</span>(bar.<span class="pl-c1">title</span>); <span class="pl-c">// Title of Bar.</span>
+
+<span class="pl-c">// Print the public variables from foo and bar.</span>
+<span class="pl-en">console</span><span class="pl-c1">.log</span>(fooA, barA); <span class="pl-c">// &gt; A from foo A from Bar</span></pre></div>
+
+<p><strong><code>foo.js</code></strong></p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-s"><span class="pl-pds">'</span>@namespace foo<span class="pl-pds">'</span></span>;
+
+<span class="pl-k">var</span> title <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>Title of Foo<span class="pl-pds">'</span></span>;
+<span class="pl-k">var</span> fooA <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>A from foo<span class="pl-pds">'</span></span>;</pre></div>
+
+<p><strong><code>bar.js</code></strong></p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-s"><span class="pl-pds">'</span>@namespace bar<span class="pl-pds">'</span></span>;
+
+<span class="pl-k">var</span> title <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>Title of Bar<span class="pl-pds">'</span></span>;
+<span class="pl-k">var</span> barA <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>A from Bar<span class="pl-pds">'</span></span>;
+
+<span class="pl-c">// Saved variables is everythings that outside any block. You can define the variable with/without "var".</span>
+<span class="pl-k">var</span> barC <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>C from Bar<span class="pl-pds">'</span></span>; <span class="pl-c">// Saved to namespace.</span>
+
+barD <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>D from Bar<span class="pl-pds">'</span></span>; <span class="pl-c">// Saved to namespace.</span>
+
+<span class="pl-k">var</span> barE <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>E from Bar<span class="pl-pds">'</span></span>, barF <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>F from Bar<span class="pl-pds">'</span></span>; <span class="pl-c">// Saved to namespace.</span>
+
+<span class="pl-k">function</span> <span class="pl-en">bars</span>() {
+    <span class="pl-k">var</span> barG <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>Bar in function<span class="pl-pds">'</span></span>; <span class="pl-c">// Not saved to namespace.</span>
+}
+
+<span class="pl-k">if</span> (<span class="pl-s"><span class="pl-pds">'</span>undefined<span class="pl-pds">'</span></span> <span class="pl-k">===</span> <span class="pl-k">typeof</span> <span class="pl-c1">global</span>) {
+    <span class="pl-k">var</span> barH <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>Bar in block<span class="pl-pds">'</span></span>; <span class="pl-c">// Not saved to namespace.</span>
+}</pre></div>
+
+<hr>
+
+<h3>
+<a id="node-import-cli" class="anchor" href="#node-import-cli" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong><code>node-import</code> CLI</strong>
+</h3>
+
+<p>Use node-import in the command line.</p>
+
+<p><strong>Usage</strong></p>
+
+<pre><code>node-import [options] [file ..]
+</code></pre>
+
+<hr>
+
+<p><strong>options</strong></p>
 
 <ul>
 <li>
@@ -281,12 +578,16 @@ loader.initConfig(config);
 <code>-h</code> Show helps.</li>
 </ul>
 
+<p><strong>Example</strong></p>
+
 <h6>
 <a id="run" class="anchor" href="#run" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Run</strong>
 </h6>
 
 <pre><code>$ node-import -r test/index.js 
 </code></pre>
+
+<hr>
 
 <h6>
 <a id="export" class="anchor" href="#export" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Export</strong>
@@ -295,124 +596,20 @@ loader.initConfig(config);
 <pre><code>$ node-import -e -o test/out test/index.js
 </code></pre>
 
+<hr>
+
 <h3>
-<a id="importexport" class="anchor" href="#importexport" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Import/Export</strong>
+<a id="notes" class="anchor" href="#notes" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong><code>NOTES</code></strong>
 </h3>
 
-<p>Import another scripts and run/export to file. Use <code>$root</code> as pattern to define as <code>root</code> cwd. E.g <code>@import $root/lib/a.js</code>.</p>
-
-<h4>
-<a id="syntax" class="anchor" href="#syntax" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Syntax</strong>
-</h4>
+<p>More examples available in <strong><code>test/</code></strong> folder.
+To test it, install the module, cd to the module folder and run <strong><code>npm test</code></strong></p>
 
 <hr>
 
-<p>Use the <code>'@import [file ..]';</code> to import the dependencies. It's should be string, like when you use <code>use strict</code>.</p>
-
-<h4>
-<a id="example-1" class="anchor" href="#example-1" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Example</strong>
-</h4>
-
-<hr>
-
-<h5>
-<a id="testjs" class="anchor" href="#testjs" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>test.js</code>
-</h5>
-
-<div class="highlight highlight-js"><pre><span class="pl-c">// Importing dependencies at begining.</span>
-<span class="pl-s1"><span class="pl-pds">'</span>@import libs/lib-a.js<span class="pl-pds">'</span></span>;
-<span class="pl-s1"><span class="pl-pds">'</span>@import libs/lib-b.js<span class="pl-pds">'</span></span>;
-
-<span class="pl-s">var</span> a <span class="pl-k">=</span> <span class="pl-s1"><span class="pl-pds">'</span>Test..<span class="pl-pds">'</span></span>;
-
-<span class="pl-c">// Create variable from file lib-a.js.</span>
-<span class="pl-s">var</span> b <span class="pl-k">=</span> libaA;
-
-<span class="pl-en">console</span><span class="pl-s3">.log</span>(a, b);</pre></div>
-
-<h5>
-<a id="libslib-ajs" class="anchor" href="#libslib-ajs" aria-hidden="true"><span class="octicon octicon-link"></span></a>
-<code>libs/lib-a.js</code>;</h5>
-
-<div class="highlight highlight-js"><pre><span class="pl-c">// Create library to be used by test.js</span>
-<span class="pl-s">var</span> libA <span class="pl-k">=</span> <span class="pl-s1"><span class="pl-pds">'</span>Foo is bar foobar<span class="pl-pds">'</span></span>;
-
-<span class="pl-c">// Import is not always in begining, and relative to cwd of lib-a.js.</span>
-<span class="pl-s1"><span class="pl-pds">'</span>@import lib-c.js<span class="pl-pds">'</span></span>;
-
-<span class="pl-c">// Imports multiple files.</span>
-<span class="pl-s1"><span class="pl-pds">'</span>@import libs/lib-a.js, libs/lib-c.js<span class="pl-pds">'</span></span>;
-<span class="pl-s1"><span class="pl-pds">'</span>@import libs/*.js<span class="pl-pds">'</span></span>;
-
-<span class="pl-c">// Import without file extension.</span>
-<span class="pl-s1"><span class="pl-pds">'</span>@import libs/lib<span class="pl-pds">'</span></span>;
-<span class="pl-s1"><span class="pl-pds">'</span>@import libs/lib.config<span class="pl-pds">'</span></span>;</pre></div>
-
-<h2>
-<a id="namespace" class="anchor" href="#namespace" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Namespace</strong>
-</h2>
-
-<p>Namespace provide ability to keep the global variables of file is not overwritten by other references.
-Namespace is limited. It's only read <code>global</code> variables and should started with new line. E.g</p>
-
-<div class="highlight highlight-js"><pre><span class="pl-s">var</span> a <span class="pl-k">=</span> <span class="pl-c1">0</span>; <span class="pl-c">// Accepted</span>
-
-b <span class="pl-k">=</span> <span class="pl-c1">1</span>, c <span class="pl-k">=</span> <span class="pl-c1">3</span>; <span class="pl-c">// Accepted</span>
-
-<span class="pl-k">if</span> (a <span class="pl-k">=</span> <span class="pl-c1">0</span>) d <span class="pl-k">=</span> <span class="pl-c1">3</span>; <span class="pl-c">// Ignored.</span></pre></div>
-
-<h4>
-<a id="syntax-1" class="anchor" href="#syntax-1" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Syntax</strong>
-</h4>
-
-<hr>
-
-<p>You can define namespace by using <code>'@namespace $NAME$';</code>. Like import, it's should be string as well.</p>
-
-<h4>
-<a id="example-2" class="anchor" href="#example-2" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Example</strong>
-</h4>
-
-<hr>
-
-<h5>
-<a id="foojs" class="anchor" href="#foojs" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>foo.js</code>
-</h5>
-
-<div class="highlight highlight-js"><pre><span class="pl-c">// Importing libs.</span>
-<span class="pl-s1"><span class="pl-pds">'</span>@import bar.js<span class="pl-pds">'</span></span>;
-
-<span class="pl-c">// Private vars.</span>
-<span class="pl-s">var</span> myfoo <span class="pl-k">=</span> <span class="pl-s1"><span class="pl-pds">'</span>Foo of foo.js<span class="pl-pds">'</span></span>;
-<span class="pl-s">var</span> exfoo <span class="pl-k">=</span> bar.foo <span class="pl-k">+</span> myfoo;
-
-<span class="pl-c">// Global vars.</span>
-<span class="pl-s">var</span> spfoo <span class="pl-k">=</span> foobar <span class="pl-k">+</span> <span class="pl-s1"><span class="pl-pds">'</span> is global<span class="pl-pds">'</span></span>;</pre></div>
-
-<h5>
-<a id="barjs" class="anchor" href="#barjs" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>bar.js</code>
-</h5>
-
-<div class="highlight highlight-js"><pre><span class="pl-c">// Create namespace</span>
-<span class="pl-s1"><span class="pl-pds">'</span>@namespace bar<span class="pl-pds">'</span></span>;
-
-<span class="pl-s">var</span> foo <span class="pl-k">=</span> <span class="pl-s1"><span class="pl-pds">'</span>Foo of Bar<span class="pl-pds">'</span></span>;
-<span class="pl-s">var</span> foobar <span class="pl-k">=</span> <span class="pl-s1"><span class="pl-pds">'</span>Global foobar<span class="pl-pds">'</span></span>;</pre></div>
-
-<h2>
-<a id="notes" class="anchor" href="#notes" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>NOTES</strong>
-</h2>
-
-<p><code>imports()</code> is flexible but always evaluate the imported scripts in the <code>global</code> context. Be carefull with a words <code>eval is evil</code> ;P
-<code>imports.module()</code> evaluate imported scripts in the NodeImport scope. So it's more safe, but limited to share objects since you need to define <code>params</code>.</p>
-
-<p>More examples available in <code>test/</code> folder. To test it, install the module, cd to the module folder and run <code>npm test</code></p>
-
-<h2>
-<a id="limitation" class="anchor" href="#limitation" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Limitation</strong>
-</h2>
-
-<hr>
+<h3>
+<a id="limitation" class="anchor" href="#limitation" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong><code>Limitation</code></strong>
+</h3>
 
 <ul>
 <li>Currently we don't support importing minified javascripts.</li>
@@ -425,10 +622,11 @@ b <span class="pl-k">=</span> <span class="pl-c1">1</span>, c <span class="pl-k"
 <code>include()</code> is just like <code>require()</code>, no sharable object in the result.</li>
 </ul>
 
-<h2>
-<a id="todo" class="anchor" href="#todo" aria-hidden="true"><span class="octicon octicon-link"></span></a>TODO</h2>
-
 <hr>
+
+<h3>
+<a id="todo" class="anchor" href="#todo" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong><code>TODO</code></strong>
+</h3>
 
 <ul>
 <li>Create CLI command <code>node-import install</code> to install NPM Packages into any folder, not only <code>node_modules</code>. Also <code>node-import update</code>.</li>
@@ -436,12 +634,14 @@ b <span class="pl-k">=</span> <span class="pl-c1">1</span>, c <span class="pl-k"
 <li>Configurations of <code>imports</code> and <code>include</code> will read the config in file <code>imports.json</code>.</li>
 </ul>
 
-<h2>
-<a id="release-history" class="anchor" href="#release-history" aria-hidden="true"><span class="octicon octicon-link"></span></a>Release History</h2>
-
 <hr>
 
+<h3>
+<a id="release-history" class="anchor" href="#release-history" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong><code>Release History</code></strong>
+</h3>
+
 <ul>
+<li>2015-03-22        v0.6.1      "Improving Readme"</li>
 <li>2015-03-08        v0.6.0      "Adding include() module"</li>
 <li>2015-03-05        v0.5.0      "Fixing namespace and add return variables as object for imports.module()"</li>
 <li>2015-03-05        v0.4.1      "Fixing source-map sources url mistake."</li>
