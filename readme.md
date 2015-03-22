@@ -1,16 +1,12 @@
-Node Import
-===========
-Imports dependencies and run it directly (sync/async) or concatenate them and exports to file.
-
-## **Why?**
-***
+**Node Import**
+---
 
 Before I write this, I just think if I can concatenate my scripts with direct import in each file.
 But when I thinking how to do that, I think I need to create script that can concatenate and run it,
 as well supporting synchronus mode without headache.
 
 By default, imported scripts executed in synchronus mode, since for async purpose nodejs already have it,
-even we have `async` module.
+even we have **`async`** module.
 
 We know that asynchronus evented I/O model is the benefits of nodejs. But sometimes, probably we need to runs
 synchronus scripts, especially when we create some modules and we need to separate the files but we need
@@ -19,17 +15,26 @@ to ensure each files can communicate with each others, including the global vari
 Now, you can export the scripts and run it in browser. I mean if you only need to concatenate files
 and minify them but still needs namespace for each file. ;)
 
-
-## **Modules**
 ***
+**Is it usefull?**
+```javascript
+// Import another files.
+'@import foo.js';
+'@import config';
 
-- `imports()` - Import scripts and run in global context (evaluated scripts will available on all modules) or export to file.
-- `imports.module()` - Import scripts and use it inside `module.expors = `. Script will evaulated after module called.
-- `include()` - Forwrad `require()` to lookup to all folder, not only inside `node_modules`.
+// Read variable from other files.
+console.log(foo.title);
 
-## **Installation**
+// Create namespace.
+'@namespace bar';
+
+// This variable will available in the namespace => bar.tilte.
+var title = 'Title of Bar';
+```
+
 ***
-
+### **`Installation`**
+---
 ```
 npm install --save node-import
 ```
@@ -40,135 +45,327 @@ To use the CLI support, install it globally.
 npm install -g node-import
 ```
 
-After installing the module, import the module in the main file of your script. Module will available in `global` object.
-Example:
+---
+After installing the module, you can load the module in the main file of your script. Module will available in
+**`global`** object.
 
-`index.js`
-
+**Example**
 ```js
+// Load node-import without wrapping to variable.
 require('node-import');
 
-imports('subdir/file.js');
-imports('subdir/another');
+// After node-import loaded, all methods will available in global scope.
+include('foo');
+imports('bar/main');
 ```
 
-## **Include**
 ***
+### **`include()`**
 
-`include()` is forwarder for `require()`. Since `require()` only lookup inside `node_modules` folder for simple require,
-`include()` will help require to lookup to other location. By default the directory for lookup is `./` or root of project.
-You can define the default location by using `include.location(DIR)`.
- 
-#### Example
- 
-* root
-	 - people
-	    - index.js
-	 - team
-	    - team.js
-	 - index.js
- 
-```js
+Include **`modules`** from outside **`node_modules`** folder. Since the default **`require()`** is only 
+access the **`node_modules`** folder, **`include()`** will help us to require modules or json from any folder.
+It's works like **`require()`**.
+
+**Usage**
+```javascript
+var foo = include(SCRIPTS);
+```
+
+---
+**Params**
+
+| **Name** | **Type** | **Description** |
+| -------- | -------- | --------------- |
+| SCRIPTS | `String` | String module name, folder name, or js/json filename. |
+
+***
+**Example**
+
+- **root**
+	 - **people**
+	    - **`index.js`**
+	 - **team**
+	    - **support**
+	        - **`main.js`**
+	        - **`package.json`**
+	    - **`team.js`**
+	 - **`index.js`**
+	 
+```javascript
+// Load the node-import first.
+require('node-import');
+
+// Include people.
 var people = include('people');     // Valid
+
+// Equal with
+var people = require('./people/index.js');
+
+// Other
 var team = include('team');         // Valid
 var index = include('index');       // Valid
- 
+
+// Include package. It's valid with `main` property defined.
+var support = include('support');   // In package.json, `main` property referenced to `main.js`
 ```
 
-## **Import/Export Usage**
-### NodeJS
 ***
+### **`imports()`**
 
-`imports(files, [options (object)]);`
+Import/Export scripts.
+You can load scripts from file and run it to global scope.
+All variables in the scripts will available to another scripts.
+Imports will always run the scripts in global scope, so using it in the **`module.exports = `** block sometimes will not works properly.
+NodeImport provide **`$root`** pattern to add root folder to the filename.
 
-##### `options`
-- `exec` - Execute the imported scripts. Default `true`
-- `async` - Execute the imported scripts in async mode. Default `false`
-- `export` - Export imported scripts to file. Default `false`
-- `exportDir` - Export location.
-- `exportMin` - Include minified version when exporting. Default `true`
-- `exportMap` - Include sourcemap when uglifying. Default `true` *(not yet tested)*
-- `RETURNS` - InlineScript object.
+**Usage**
+```javascript
+var script = imports(FILES, OPTIONS);
+```
 
-```js
-var imports = require('node-import');
+**Returns: `script object`**
 
-// Just execute.
-imports('./test.js');
+---
+**Params**
 
-// Execute and get the scripts.
-var result = imports('./test.js');
+| **Name** | **Type** | **Description** |
+| -------- | -------- | --------------- |
+| FILES | `String` or `Array` | Script filename or array filename lists. You can ignore the file extension. Add `$root` in the filename as root folder. |
+| OPTIONS `optional` | `Object` | Object contains the import options. |
 
-// Write out the result.
-fs.writeFile(foofile, result.text, fn);
+---
+**Options**
 
-// Re-call the script.
-result.run();
+Remember, options name is case-sencitive.
+
+| **Name** | **Type** | **Default** | **Description** |
+| -------- | -------- | ----------- | --------------- |
+| exec | `Boolean` | `true` | Run the imported scripts or not. |
+| async | `Boolean` | `false` | Run the imported scripts in `async` mode or not. |
+| export | `Boolean` | `false` | Export the imported scripts to file or not. |
+| exportDir | `String` | `null` | Folder location to save the imported scripts. |
+| exportMin | `Boolean` | `true` | Also save the minified version when exporting scripts. |
+| exportMap | `Boolean` | `true` | Also save the sourcemap file when exporting scripts. |
+
+---
+**Example**
+```javascript
+// Load the node-import first.
+require('node-import');
+
+// Imports foo.js file and run it.
+var foo = imports('foo/main');
+
+// Re-run the imported scripts.
+foo.run();
+
+// Print the imported scripts.
+console.log(foo.text);
 
 // Only export the scripts.
-imports('./test.js', { exec: false, export: true, exportDir: './test/out' });
+imports('foo/extra', { exec: false, export: true, exportDir: 'test/out' });
 ```
 
-### NodeJS - In Module
 ***
+### **`imports.module()`**
 
-`imports.module(files, [params { wrap: origin }], verbose);`
+Import scripts inside **`module.exports`** block. The difference with **`imports()`** is the scripts will be
+evaluated when the module is used. While **`imports()`** is evaluated directly into global scope.
 
-The difference between `imports()` and `imports.module()` is how script loaded.
-`imports()` will evaluate the scripts directly, while `imports.module()` is load the scripts but evaluated by module call.
+Imported scripts using **`import.module()`** will be evaluated in the **`node-import`** scope, so it's safe.
+The benefit is the result will contains all global variables in the imported scripts. While **`require()`** will only
+contains exported module.
 
-`imports.module()` also returns `object` contains all global variables in the imported scripts.
-Like `require`, but `imports.module()` will export all variables, not only object in `module.exports`.
+**Usage**
+```javascript
+var result = imports(FILES, SHARED_VARIABLES);
+```
 
-E.g: `var mod = require('some-module');`. `imports()` inside `some-module` will evaluated directly as soon as module laoded.
-While `imports.module()` will evaluated when `mod()` is called.
+---
+**Params**
 
-##### `Details`
-- `files` - Files to import. E.g: `source/main.js`.
-- `params` - Object contains paramaters to share with imported scripts. `wrap` is variable name to be used, origin is the original object.
-- `verbose` - Show detailed logs.
-- `RETURNS` - Object contains variables.
+| **Name** | **Type** | **Description** |
+| -------- | -------- | --------------- |
+| FILES | `String` or `Array` | Script filename or array filename lists. You can ignore the file extension. |
+| SHARED_VARIABLES `optional` | `Object` | Object contains variables to share with imported scripts. |
 
-##### Example in `Gruntfile.js`
-
+---
+**Example**
 ```js
-var imports = require('node-import');
+// Load node-import first.
+require('node-import');
 
-module.expors = function(grunt) {
-	// Importing configs.
-	var configs = imports.module('./grunt-config/config.js', { loader: grunt });
+module.expors = function(param) {
+	// Importing foo.js and share parameters with imported scripts.
+	var foo = imports.module('foo/main', { shared: param });
 	
-	// configs will contains variables from config.js, also from all imported scripts by config.js
-	console.log(configs.taskname);
-	console.log(configs.taskowner);
+	// foo contains the global variables from foo.js
+	console.log(foo.title);
+	console.log(foo.description);
 };
 ```
 
-`grunt-config/config.js`
+**`foo/main.js`**
 
 ```js
-var taskname = 'Test';
-var taskowner = 'Also test';
+// Create variables to share to result.
+var title = 'Foo title';
+var description = 'The foo is a non-bar string and always be foo';
 
-// Importing main config and tasks.
-'@import task-list.js`;
-
-// Initializing grunt.
-// "loader" is equal to "grunt" since it's shared by importer above.
-// "config" is namespace from "task-list.js"
-loader.initConfig(config);
-
-// Importing task loader.
-'@import task-loader.js`;
+// Read the shared variables from the importer.
+console.log(shared);
 ```
 
-
-### CLI
 ***
+### **`@import`**
 
-`node-import [options] [file ..]`
+This is pattern to import another scripts and require to be loaded by **`imports()`** or **`imports.module()`**.
+The pattern options will follow the **`imports()`** or **`imports.module()`** options.
 
-##### `options`
+**Usage**
+
+The pattern must be defined using string. Like when we use **`'use strict';`**.
+
+```javascript
+'@import [FILES ...]';
+
+// Do something with imported scripts.
+```
+
+---
+**Params**
+
+| **Name** | **Type** | **Description** |
+| -------- | -------- | --------------- |
+| FILES | `String` | File name with extension, file name without extension, folder name or comma separated file names. |
+
+---
+**Example**
+
+**`test.js`**
+```js
+// Load node-import first.
+require('node-import');
+
+// Importing importing lib-a.js using imports() since pattern wont works without this importer in the main script.
+imports('libs/lib-a');
+
+// Access the variables from imported scripts.
+console.log(title); // > Title from lib-a.js
+console.log(description); // > Description from lib-a.js
+
+// Replace the title
+title = 'Replaced title';
+
+// Print the title
+console.log(title); // > Replaced title
+```
+
+**`libs/lib-a.js`**
+```js
+// Import another file at begining.
+'@import lib-b.js';
+
+// Create variables to share it.
+var title = 'Title from lib-a.js';
+var description = 'Description from lib-a.js';
+
+// Import is not always at begining, and relative to the last working directory.
+'@import lib-c.js';
+
+// Imports multiple files with comma separated.
+'@import libs/lib-d.js, libs/lib-e.js';
+
+// Import without file extension.
+'@import libs/code'; // If folder contains code.a.js or code.b.js it's will be imported as well.
+
+// Import all files inside folder. *.js is important!
+'@import libs/configs/*.js';
+```
+
+***
+### **`@namespace`**
+
+Namespace is pattern to makes the variables in the imported file will available as **`public`** and **`private`**.
+It's mean when you have variables with same name, variable inside the namespace will not replaced by next changes.
+
+**Usage**
+```javascript
+'@namespace NAME';
+
+// Do anythings.
+```
+
+---
+**Params**
+
+| **Name** | **Type** | **Description** |
+| -------- | -------- | --------------- |
+| NAME | `String` | Namespace name. It's will be used when you access the namespace. |
+
+---
+**Example**
+```javascript
+// Importing namespaces.
+'@import foo';
+'@import bar';
+
+// The public title is title of bar since title from foo is replaced by title from bar.
+console.log(title); // > Title of Bar.
+
+// Print the title of foo. Since it's in namespace, it wont be replaced by title from bar.
+console.log(foo.title); // Title of Foo
+
+// Print the title of bar.
+console.log(bar.title); // Title of Bar.
+
+// Print the public variables from foo and bar.
+console.log(fooA, barA); // > A from foo A from Bar
+```
+
+**`foo.js`**
+```javascript
+'@namespace foo';
+
+var title = 'Title of Foo';
+var fooA = 'A from foo';
+```
+
+**`bar.js`**
+```javascript
+'@namespace bar';
+
+var title = 'Title of Bar';
+var barA = 'A from Bar';
+
+// Saved variables is everythings that outside any block. You can define the variable with/without "var".
+var barC = 'C from Bar'; // Saved to namespace.
+
+barD = 'D from Bar'; // Saved to namespace.
+
+var barE = 'E from Bar', barF = 'F from Bar'; // Saved to namespace.
+
+function bars() {
+    var barG = 'Bar in function'; // Not saved to namespace.
+}
+
+if ('undefined' === typeof global) {
+    var barH = 'Bar in block'; // Not saved to namespace.
+}
+```
+
+***
+### **`node-import` CLI** 
+
+Use node-import in the command line.
+
+**Usage**
+```
+node-import [options] [file ..]
+```
+
+---
+**options**
 - `-r` Run imported scripts. Default `false`
 - `-a` Run in async mode. Default `false`
 - `-e` Export imported scripts. Default `false`
@@ -178,109 +375,25 @@ loader.initConfig(config);
 - `-v` Logs all processes.
 - `-h` Show helps.
 
+**Example**
 ###### **Run**
 ```
 $ node-import -r test/index.js 
 ```
 
+---
 ###### **Export**
 ```
 $ node-import -e -o test/out test/index.js
 ```
 
-### **Import/Export**
-Import another scripts and run/export to file. Use `$root` as pattern to define as `root` cwd. E.g `@import $root/lib/a.js`.
-
-#### **Syntax**
 ***
+### **`NOTES`**
+More examples available in **`test/`** folder.
+To test it, install the module, cd to the module folder and run **`npm test`**
 
-Use the `'@import [file ..]';` to import the dependencies. It's should be string, like when you use `use strict`.
-
-#### **Example**
 ***
-
-##### `test.js`
-```js
-// Importing dependencies at begining.
-'@import libs/lib-a.js';
-'@import libs/lib-b.js';
-
-var a = 'Test..';
-
-// Create variable from file lib-a.js.
-var b = libaA;
-
-console.log(a, b);
-```
-
-##### `libs/lib-a.js`;
-```js
-// Create library to be used by test.js
-var libA = 'Foo is bar foobar';
-
-// Import is not always in begining, and relative to cwd of lib-a.js.
-'@import lib-c.js';
-
-// Imports multiple files.
-'@import libs/lib-a.js, libs/lib-c.js';
-'@import libs/*.js';
-
-// Import without file extension.
-'@import libs/lib';
-'@import libs/lib.config';
-```
-
-## **Namespace**
-Namespace provide ability to keep the global variables of file is not overwritten by other references.
-Namespace is limited. It's only read `global` variables and should started with new line. E.g
-
-```js
-var a = 0; // Accepted
-
-b = 1, c = 3; // Accepted
-
-if (a = 0) d = 3; // Ignored.
-```
-
-#### **Syntax**
-***
-
-You can define namespace by using `'@namespace $NAME$';`. Like import, it's should be string as well.
-
-#### **Example**
-***
-
-##### `foo.js`
-```js
-// Importing libs.
-'@import bar.js';
-
-// Private vars.
-var myfoo = 'Foo of foo.js';
-var exfoo = bar.foo + myfoo;
-
-// Global vars.
-var spfoo = foobar + ' is global';
-```
-
-##### `bar.js`
-```js
-// Create namespace
-'@namespace bar';
-
-var foo = 'Foo of Bar';
-var foobar = 'Global foobar';
-```
-
-
-## **NOTES**
-`imports()` is flexible but always evaluate the imported scripts in the `global` context. Be carefull with a words `eval is evil` ;P
-`imports.module()` evaluate imported scripts in the NodeImport scope. So it's more safe, but limited to share objects since you need to define `params`.
-
-More examples available in `test/` folder. To test it, install the module, cd to the module folder and run `npm test`
-
-## **Limitation**
-***
+### **`Limitation`**
 
 * Currently we don't support importing minified javascripts.
 * Namespace only read global variables in imported scripts.
@@ -288,16 +401,17 @@ More examples available in `test/` folder. To test it, install the module, cd to
 * `imports.module()` only share variable in the import result.
 * `include()` is just like `require()`, no sharable object in the result.
 
-## TODO
 ***
+### **`TODO`**
 
 * Create CLI command `node-import install` to install NPM Packages into any folder, not only `node_modules`. Also `node-import update`.
 * Provide support to `imports()` to lookup in default `include` folder.
 * Configurations of `imports` and `include` will read the config in file `imports.json`.
 
-## Release History
 ***
+### **`Release History`**
 
+* 2015-03-22        v0.6.1      "Improving Readme"
 * 2015-03-08        v0.6.0      "Adding include() module"
 * 2015-03-05        v0.5.0      "Fixing namespace and add return variables as object for imports.module()"
 * 2015-03-05        v0.4.1      "Fixing source-map sources url mistake."
