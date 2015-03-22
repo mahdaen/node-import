@@ -1,0 +1,90 @@
+// New line value additions holder.
+$tmp-box-shadow-value: none;
+$tmp-text-shadow-e-value: none;
+
+// Single/multiple box shadows in arguments.
+// @include box-shadows(0 0 1px #000);
+// @include box-shadows(0 0 1px #000, 0 0 2px #ccc, 0 0 1px #ddd);
+@mixin box-shadows($value...) {
+    @include prefixer(box-shadow, $value, true);
+}
+
+// Single box-shadow value set, supporting additions.
+// @include box-shadow(0 0 1px #fff, true);
+@mixin box-shadow($value, $append: false) {
+    @if ($tmp-box-shadow-value == none) {
+        $tmp-box-shadow-value: $value !global;
+    }
+    @else {
+        $tmp-box-shadow-value: ($tmp-box-shadow-value, $value) !global;
+    }
+
+    // Insert box-shadow property if it's end of additions.
+    @if ($append == false) {
+        @include prefixer(box-shadow, $tmp-box-shadow-value, true);
+
+        // Resetting box shadow value.
+        $tmp-box-shadow-value: none !global;
+    }
+}
+
+// Single/multiple text-shadows in arguments.
+// @include text-shadows(0 0 1px #000);
+// @include text-shadows(0 0 1px #000, 0 0 2px #ccc, 0 0 1px #ddd);
+@mixin text-shadows($value...) {
+    @include prefixer(text-shadow, $value, true);
+}
+
+// New line value additions holder.
+
+// Single text-shadow value set, supporting additions.
+// @include text-shadow(0 0 1px #fff, true);
+@mixin text-shadow($value, $append: false) {
+    @if ($tmp-text-shadow-e-value == none) {
+        $tmp-text-shadow-e-value: $value !global;
+    }
+    @else {
+        $tmp-text-shadow-e-value: ($tmp-text-shadow-e-value, $value) !global;
+    }
+
+    // Insert text-shadow property if it's end of additions.
+    @if ($append == false) {
+        @include prefixer(text-shadow, $tmp-text-shadow-e-value, true);
+
+        // Resetting box shadow value.
+        $tmp-text-shadow-e-value: none !global;
+    }
+}
+
+// Drop shadow.
+@mixin drop-shadows($value) {
+    @include box-shadow($value);
+}
+@mixin drop-shadow($value, $append: false) {
+    @include box-shadow($value, $append);
+}
+
+// Inner Shadow.
+@mixin inner-shadows($value) {
+    @include box-shadows(inset $value);
+}
+@mixin inner-shadow($value, $append: false) {
+    @include box-shadow(inset $value, $append);
+}
+
+// LONG DROP SHADOW
+// @include long-drop-shadow(top left distance blur color);
+@mixin long-drop-shadow($config: none) {
+    @if ($config != none and length($config) == 5) {
+        @include long-shadow-generator(box-shadow, $config);
+    }
+}
+
+// LONG TEXT SHADOW
+// @include long-text-shadow(top left distance blur color);
+@mixin long-text-shadow($config: none) {
+    @if ($config != none and length($config) == 5) {
+        @include long-shadow-generator(text-shadow, $config);
+    }
+}
+

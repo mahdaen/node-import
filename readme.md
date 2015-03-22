@@ -355,7 +355,7 @@ if ('undefined' === typeof global) {
 ```
 
 ***
-### **`node-import` CLI** 
+### **`node-import` CLI**
 
 Use node-import in the command line.
 
@@ -388,6 +388,56 @@ $ node-import -e -o test/out test/index.js
 ```
 
 ***
+### **`node-import -i` CLI**
+
+Install NPM packages to any folder, not just **`node_modules`**.
+Since we already have the **`include()`** above, then installing packages outside **`node_modules`**
+folder is fine.
+
+**Usage**
+
+To makes the installer working, you must have **`imports.json`** file in the root folder of your project
+with properties:
+
+* **packages** - Array packages list to be installed by **`node-import -i`**
+* **location** - String location install the packages.
+
+```
+node-import -i [PACKAGES] (--save)
+```
+
+---
+**Params**
+
+| **Name** | **Type** | **Description** |
+| -------- | -------- | --------------- |
+| PACKAGES | `String` | String package name to install. You can install multiple packages by separate them using space. |
+| SAVE `optional` | `Boolean` | Save the installed package to **`imports.json`** if not already exists.
+
+---
+**Example**
+
+**`imports.json`**
+```json
+{
+	"packages": ["short-sass", "native-js"],
+	"location: "libraries/"
+}
+```
+
+```shell
+# Install and add the installed packages to imports.json.
+node-import -i short-sass grunt-export --save
+
+# Install all packages in imports.json
+node-import -i
+
+# Custom installation dir, not using the location in imports()
+node-import -i -o core-sys/libs --save short-sass native-js
+```
+
+
+***
 ### **`NOTES`**
 More examples available in **`test/`** folder.
 To test it, install the module, cd to the module folder and run **`npm test`**
@@ -411,6 +461,7 @@ To test it, install the module, cd to the module folder and run **`npm test`**
 ***
 ### **`Release History`**
 
+* 2015-03-22        v0.7.0      "Adding CLI package installer."
 * 2015-03-22        v0.6.1      "Improving Readme"
 * 2015-03-08        v0.6.0      "Adding include() module"
 * 2015-03-05        v0.5.0      "Fixing namespace and add return variables as object for imports.module()"

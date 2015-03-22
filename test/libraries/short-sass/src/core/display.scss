@@ -1,0 +1,144 @@
+@mixin block($size: none) {
+	@include set-display(block, $size);
+}
+
+@mixin inline($size: none) {
+	@include set-display(inline, $size);
+}
+
+@mixin inline-block($size: none) {
+	@include set-display(inline-block, $size);
+
+    *display: inline;
+    zoom: 1;
+}
+
+@mixin table($size: none) {
+	@include set-display(table, $size);
+}
+
+@mixin table-row($size: none) {
+	@include set-display(table-row, $size);
+}
+
+@mixin table-cell($size: none) {
+	@include set-display(table-cell, $size);
+}
+
+@mixin table-caption($size: none) {
+	@include set-display(table-caption, $size);
+}
+
+@mixin table-column-group($size: none) {
+	@include set-display(table-column-group, $size);
+}
+
+@mixin table-header-group($size: none) {
+	@include set-display(table-header-group, $size);
+}
+
+@mixin table-footer-group($size: none) {
+	@include set-display(table-footer-group, $size);
+}
+
+@mixin table-row-group($size: none) {
+	@include set-display(table-caption, $size);
+}
+
+@mixin inline-table($size: none) {
+	@include set-display(inline-table, $size);
+}
+
+@mixin inline-flex($size: none) {
+	@include set-display(inline-flex, $size);
+}
+
+
+@mixin list-item($size: none) {
+	@include set-display(list-item, $size);
+}
+
+@mixin run-in($size: none) {
+	@include set-display(run-in, $size);
+}
+
+// Visibility.
+@mixin invisible {
+    visibility: hidden;
+    opacity: 0;
+}
+
+@mixin visible {
+    visibility: visible;
+    opacity: 1;
+}
+
+@mixin hide {
+    display: none !important;
+}
+
+@mixin show {
+    display: block !important;
+}
+
+@mixin hidden {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+}
+
+// Dimensions
+@mixin size($size: none) {
+    @if ($size != none) {
+        @if (length($size) == 1) {
+            @if (nth($size, 1) != none) {
+                width: nth($size, 1);
+                height: nth($size, 1);
+            }
+        }
+        @else if (length($size) == 2) {
+            @if (nth($size, 1) != none) {
+                width: nth($size, 1);
+            }
+            @if (nth($size, 2) != none) {
+                height: nth($size, 2);
+            }
+        }
+    }
+}
+@mixin max-size($size: none) {
+    @if ($size != none) {
+        @if (length($size) == 1) {
+            @if (nth($size, 1) != none) {
+                max-width: nth($size, 1);
+                max-height: nth($size, 1);
+            }
+        }
+        @else if (length($size) == 2) {
+            @if (nth($size, 1) != none) {
+                max-width: nth($size, 1);
+            }
+            @if (nth($size, 2) != none) {
+                max-height: nth($size, 2);
+            }
+        }
+    }
+}
+@mixin min-size($size: none) {
+    @if ($size != none) {
+        @if (length($size) == 1) {
+            @if (nth($size, 1) != none) {
+                min-width: nth($size, 1);
+                min-height: nth($size, 1);
+            }
+        }
+        @else if (length($size) == 2) {
+            @if (nth($size, 1) != none) {
+                min-width: nth($size, 1);
+            }
+            @if (nth($size, 2) != none) {
+                min-height: nth($size, 2);
+            }
+        }
+    }
+}

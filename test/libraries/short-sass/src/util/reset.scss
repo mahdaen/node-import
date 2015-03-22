@@ -1,0 +1,56 @@
+// Reset Default Browser Style.
+@mixin reset() {
+    // Resetting HTML and BODY layout.
+    html, body {
+        @include size(100%);
+        @include font-smoothing();
+
+        margin: 0;
+    }
+
+    // Force elements box sizing to border box.
+    body * {
+        @include box-sizing(border-box);
+    }
+
+    // Resetting.
+    ul {
+        @include block();
+
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    // Reseting.
+    input {
+        @include appearance(none);
+
+        &:focus {
+            outline: none;
+        }
+    }
+
+    // Resetting Headings.
+    h1, h2, h3, h4, h5, h6 {
+        margin: 0;
+    }
+
+    // Resetting Anchor.
+    a {
+        @include inline-block();
+
+        text-decoration: none;
+
+        &:focus, &:hover, &:visited {
+            outline: none;
+        }
+    }
+}
+
+// Block Debugger. Show box rectangles to debug layout.
+@mixin debug-block {
+    body * {
+        box-shadow: 0 0 0 1px red !important;
+    }
+}

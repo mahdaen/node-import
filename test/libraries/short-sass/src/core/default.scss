@@ -1,0 +1,225 @@
+// CSS3 Standards.
+@mixin background-clip($value) {
+	@include prefixer(background-clip, $value, true);
+}
+
+@mixin background-origin($value) {
+	@include prefixer(background-origin, $value, true);
+}
+
+@mixin background-size($value) {
+	@include prefixer(background-size, $value, true);
+}
+
+@mixin box-align($value) {
+	@include prefixer(box-align, $value, true);
+}
+
+@mixin box-direction($value) {
+	@include prefixer(box-direction, $value, true);
+}
+
+@mixin box-decoration-break($value) {
+	@include prefixer(box-decoration-break, $value, true);
+}
+
+@mixin box-flex($value) {
+	@include prefixer(box-flex, $value, true);
+}
+
+@mixin box-flex-group($value) {
+	@include prefixer(box-flex-group, $value, true);
+}
+
+@mixin box-lines($value) {
+	@include prefixer(box-lines, $value, true);
+}
+
+@mixin box-ordinal-group($value) {
+	@include prefixer(box-ordinal-group, $value, true);
+}
+
+@mixin box-orient($value) {
+	@include prefixer(box-orient, $value, true);
+}
+
+@mixin box-pack($value) {
+	@include prefixer(box-pack, $value, true);
+}
+
+@mixin break-after($value) {
+	@include prefixer(break-after, $value, true);
+}
+
+@mixin break-before($value) {
+	@include prefixer(break-before, $value, true);
+}
+
+@mixin break-inside($value) {
+	@include prefixer(break-inside, $value, true);
+}
+
+@mixin columns($value) {
+	@include prefixer(columns, $value, true);
+}
+
+@mixin column-count($value) {
+	@include prefixer(column-count, $value, true);
+}
+
+@mixin column-fill($value) {
+	@include prefixer(column-fill, $value, true);
+}
+
+@mixin column-gap($value) {
+	@include prefixer(column-gap, $value, true);
+}
+
+@mixin column-rule($value) {
+	@include prefixer(column-rule, $value, true);
+}
+
+@mixin column-rule-color($value) {
+	@include prefixer(column-rule-color, $value, true);
+}
+
+@mixin column-rule-style($value) {
+	@include prefixer(column-rule-style, $value, true);
+}
+
+@mixin column-rule-width($value) {
+	@include prefixer(column-rule-width, $value, true);
+}
+
+@mixin column-span($value) {
+	@include prefixer(column-span, $value, true);
+}
+
+@mixin column-width($value) {
+	@include prefixer(column-width, $value, true);
+}
+
+@mixin marquee-direction($value) {
+	@include prefixer(marquee-direction, $value, true);
+}
+
+@mixin marquee-play-count($value) {
+	@include prefixer(marquee-play-count, $value, true);
+}
+
+@mixin marquee-speed($value) {
+	@include prefixer(marquee-speed, $value, true);
+}
+
+@mixin marquee-style($value) {
+	@include prefixer(marquee-style, $value, true);
+}
+
+@mixin nav-index($value) {
+	@include prefixer(nav-index, $value, true);
+}
+
+@mixin nav-left($value) {
+	@include prefixer(nav-left, $value, true);
+}
+
+@mixin nav-right($value) {
+	@include prefixer(nav-right, $value, true);
+}
+
+@mixin nav-up($value) {
+	@include prefixer(nav-up, $value, true);
+}
+
+@mixin rotation($value) {
+	@include prefixer(rotation, $value, true);
+}
+
+@mixin rotation-point($value) {
+	@include prefixer(rotation-point, $value, true);
+}
+
+@mixin text-wrap($value) {
+	@include prefixer(text-wrap, $value, true);
+}
+
+@mixin grid-columns($value) {
+	@include prefixer(grid-columns, $value, true);
+}
+
+@mixin grid-rows($value) {
+	@include prefixer(grid-rows, $value, true);
+}
+
+@mixin hanging-punctuation($value) {
+	@include prefixer(hanging-punctuation, $value, true);
+}
+
+@mixin icon($value) {
+	@include prefixer(icon, $value, true);
+}
+
+@mixin punctuation-trim($value) {
+	@include prefixer(punctuation-trim, $value, true);
+}
+
+@mixin resize($value) {
+	@include prefixer(resize, $value, true);
+}
+
+@mixin filter($value) {
+	@include prefixer(filter, $value, true);
+}
+
+@mixin text-size-adjust($value) {
+	@include prefixer(text-size-adjust, $value, true);
+}
+
+@mixin clip-path($value) {
+	@include prefixer(clip-path, $value, true);
+}
+
+@mixin target($value) {
+	@include prefixer(target, $value, true);
+}
+
+@mixin target-name($value) {
+	@include prefixer(target-name, $value, true);
+}
+
+@mixin target-new($value) {
+	@include prefixer(target-new, $value, true);
+}
+
+@mixin target-position($value) {
+	@include prefixer(target-position, $value, true);
+}
+
+@mixin word-break($value) {
+	@include prefixer(word-break, $value, true);
+}
+
+@mixin word-wrap($value) {
+	@include prefixer(word-wrap, $value, true);
+}
+
+// Appearance.
+@mixin appearance($arg) {
+	@include prefixer(appearance, $arg, true);
+}
+
+// Box Sizing.
+@mixin box-sizing($arg) {
+	@include prefixer(box-sizing, $arg, true);
+}
+
+// Backface Visibility.
+@mixin backface-visibility($arg) {
+	@include prefixer(backface-visibility, $arg, true);
+}
+
+// User select.
+@mixin user-select($arg) {
+	@include prefixer(user-select, $arg, true);
+}
+

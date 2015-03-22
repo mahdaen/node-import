@@ -1,0 +1,301 @@
+@mixin normalize() {
+    /*
+     * ADAPTING BOILERPLATE.CSS
+     * ---------------------------------------------------------------------------
+     * HTML5 ✰ Boilerplate
+     *
+     * What follows is the result of much research on cross-browser styling.
+     * Credit left inline and big thanks to Nicolas Gallagher, Jonathan Neal,
+     * Kroc Camen, and the H5BP dev community and team.
+     *
+     * Detailed information about this CSS: h5bp.com/css
+     *
+     * normalize -----------------------------------------------------------------
+     */
+
+    html {
+        font-size: 100%;
+        height: 100%;
+        overflow-y: auto;
+
+        @include text-size-adjust(100%);
+    }
+
+    body {
+        font-size: 100%;
+        line-height: 1.231;
+        position: relative;
+    }
+
+    article,
+    aside,
+    details,
+    figcaption,
+    footer,
+    header,
+    hgroup,
+    nav,
+    section,
+    figure {
+        display: block;
+    }
+
+    figure {
+        margin: 0;
+    }
+
+    ::selection {
+        background-color: #cbcbcb;
+
+        @include text-shadow(none);
+    }
+
+    ::-moz-selection {
+        background-color: #cbcbcb;
+
+        @include text-shadow(none);
+    }
+
+    abbr[title] {
+        border-bottom: 1px dotted;
+    }
+
+    b {
+        font-weight: bold;
+    }
+
+    strong {
+        font-weight: bold;
+    }
+
+    blockquote {
+        margin: 1em 40px;
+    }
+
+    dfn {
+        font-style: italic;
+    }
+
+    hr {
+        border: 0;
+        border-top: 1px solid #ccc;
+        display: block;
+        height: 1px;
+        margin: 1em 0;
+        padding: 0;
+    }
+
+    ins {
+        background: #ff9;
+        color: #000;
+        text-decoration: none;
+    }
+
+    mark {
+        background: #ff0;
+        color: #000;
+        font-style: italic;
+        font-weight: bold;
+    }
+
+    pre {
+        font-family: monospace, serif;
+        font-size: 1em;
+        white-space: pre-wrap;
+        white-space: pre;
+
+        @include word-wrap(break-word);
+    }
+
+    code {
+        font-family: monospace, serif;
+        font-size: 1em;
+    }
+
+    kbd {
+        font-family: monospace, serif;
+        font-size: 1em;
+    }
+
+    samp {
+        font-family: monospace, serif;
+        font-size: 1em;
+    }
+
+    q {
+        quotes: none;
+    }
+
+    q:before {
+        content: "";
+        content: none;
+    }
+
+    q:after {
+        content: "";
+        content: none;
+    }
+
+    small {
+        font-size: 85%;
+    }
+
+    sub {
+        bottom: -0.25em;
+        font-size: 75%;
+        line-height: 0;
+        position: relative;
+        vertical-align: baseline;
+    }
+
+    sup {
+        font-size: 75%;
+        line-height: 0;
+        position: relative;
+        top: -0.5em;
+        vertical-align: baseline;
+    }
+
+    ul {
+        margin: 1em 0;
+        padding: 0 0 0 40px;
+    }
+
+    ol {
+        margin: 1em 0;
+        padding: 0 0 0 40px;
+    }
+
+    dd {
+        margin: 0 0 0 40px;
+    }
+
+    nav ul {
+        list-style: none;
+        list-style-image: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    nav ol {
+        list-style: none;
+        list-style-image: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    img {
+        -ms-interpolation-mode: bicubic;
+        border: 0;
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    svg:not(:root) {
+        overflow: hidden;
+    }
+
+    form {
+        margin: 0;
+    }
+
+    fieldset {
+        border: 0;
+        margin: 0;
+        padding: 0;
+    }
+
+    label {
+        cursor: pointer;
+    }
+
+    legend {
+        *margin-left: -7px;
+        border: 0;
+        padding: 0;
+    }
+
+    button {
+        @include appearance(none);
+
+        *overflow: visible;
+        *vertical-align: middle;
+        cursor: pointer;
+        font-size: 100%;
+        line-height: normal;
+        margin: 0;
+        vertical-align: baseline;
+    }
+
+    input {
+        *vertical-align: middle;
+        font-size: 100%;
+        line-height: normal;
+        margin: 0;
+        vertical-align: baseline;
+    }
+
+    select {
+        *vertical-align: middle;
+        font-size: 100%;
+        margin: 0;
+        vertical-align: baseline;
+    }
+
+    textarea {
+        *vertical-align: middle;
+        font-size: 100%;
+        margin: 0;
+        vertical-align: baseline;
+    }
+
+    input[type="button"], input[type="reset"], input[type="submit"], input[type="text"] {
+        @include appearance(none);
+
+        *overflow: visible;
+    }
+
+    input[type="button"], input[type="reset"], input[type="submit"], {
+        cursor: pointer;
+    }
+
+    input[type="checkbox"], input[type="radio"] {
+        padding: 0;
+        cursor: pointer;
+    }
+
+    input[type="search"] {
+        @include appearance(textfield);
+    }
+
+    input[type="search"]::-webkit-search-decoration {
+        @include appearance(none);
+    }
+
+    button::-moz-focus-inner {
+        border: 0;
+        padding: 0;
+    }
+
+    input::moz-focus-inner {
+        border: 0;
+        padding: 0;
+    }
+
+    table {
+        border-collapse: collapse;
+        border-spacing: 0;
+    }
+
+    td {
+        vertical-align: top;
+    }
+
+    p {
+        margin: 0;
+    }
+
+    span {
+        display: inline-block;
+    }
+}

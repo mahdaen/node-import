@@ -1,0 +1,62 @@
+// Border Radius
+@mixin border-radius($value...) {
+    @include prefixer(border-radius, $value, true);
+}
+@mixin border-top-left-radius($value...) {
+    @include prefixer(border-top-left-radius, $value, true);
+}
+@mixin border-top-right-radius($value...) {
+    @include prefixer(border-top-right-radius, $value, true);
+}
+@mixin border-bottom-left-radius($value...) {
+    @include prefixer(border-bottom-left-radius, $value, true);
+}
+@mixin border-bottom-right-radius($value...) {
+    @include prefixer(border-bottom-right-radius, $value, true);
+}
+
+// Border Image
+@mixin border-image($value...) {
+    @include prefixer(border-image, $value, true);
+}
+@mixin border-image-outset($value...) {
+    @include prefixer(border-image-outset, $value, true);
+}
+@mixin border-image-repeat($value...) {
+    @include prefixer(border-image-repeat, $value, true);
+}
+@mixin border-image-slice($value...) {
+    @include prefixer(border-image-slice, $value, true);
+}
+@mixin border-image-source($value...) {
+    @include prefixer(border-image-source, $value, true);
+}
+@mixin border-image-width($value...) {
+    @include prefixer(border-image-width, $value, true);
+}
+
+// Two side radius.
+@mixin border-top-radius($value) {
+    @include border-top-left-radius($value);
+    @include border-top-right-radius($value);
+}
+@mixin border-right-radius($value) {
+    @include border-top-right-radius($value);
+    @include border-bottom-right-radius($value);
+}
+@mixin border-bottom-radius($value) {
+    @include border-bottom-left-radius($value);
+    @include border-bottom-right-radius($value);
+}
+@mixin border-left-radius($value) {
+    @include border-top-left-radius($value);
+    @include border-bottom-left-radius($value);
+}
+@mixin border-upright-radius($value) {
+    @include border-top-right-radius($value);
+    @include border-bottom-left-radius($value);
+}
+@mixin border-upleft-radius($value) {
+    @include border-top-left-radius($value);
+    @include border-bottom-right-radius($value);
+}

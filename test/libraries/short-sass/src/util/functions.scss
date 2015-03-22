@@ -1,0 +1,89 @@
+// Concat list or map.
+@function concat($list...) {
+    $value: '';
+
+    @for $i from 1 through length($list) {
+        $com: ',';
+
+        @if ($i == 1) {
+            $value: nth($list, $i)#{$com};
+        }
+        @else if ($i == length($list)) {
+            $value: $value nth($list, $i);
+        }
+        @else {
+            $value: $value nth($list, $i)#{$com};
+        }
+    }
+
+    @return $value;
+}
+
+// Concat prefixed value.
+@function concat-prefix($prop, $list) {
+    $value: '';
+
+    @for $i from 1 through length($list) {
+        $com: ',';
+
+        @if ($i == 1) {
+            $value: #{$prop}#{'('}nth($list, $i)#{')'}#{$com};
+        }
+        @else if ($i > 1 and $i < length($list)) {
+            $value: $value #{$prop}#{'('}nth($list, $i)#{')'}#{$com};
+        }
+        @else {
+            $value: $value #{$prop}#{'('}nth($list, $i)#{')'};
+        }
+    }
+
+    @return $value;
+}
+
+// Shadow value maker.
+@function shadow-value($top, $left, $distance, $blur, $color) {
+    $value: none; $deca: 1; $decb: 0;
+
+    @if ($blur > 0) {
+        $decb: (1 / ($distance - $blur));
+    }
+
+    @for $i from 1 through $distance {
+        // Negative increament.
+        @if ($top < 0) {
+            $top: ($top - 1);
+        }
+        @else if ($top > 0) {
+            $top: ($top + 1);
+        }
+        @else {
+            $top: 0;
+        }
+
+        @if ($left < 0) {
+            $left: ($left - 1);
+        }
+        @else if ($left > 0) {
+            $left: ($left + 1);
+        }
+        @else {
+            $left: 0;
+        }
+
+        @if ($i == 1) {
+            $value: #{$top}px #{$left}px rgba($color, 1);
+        }
+        @else {
+            @if ($i >= $blur) {
+                $deca: ($deca - $decb);
+
+                $value: #{$value}, #{$top}px #{$left}px rgba($color, $deca);
+            }
+            @else {
+                $value: #{$value}, #{$top}px #{$left}px rgba($color, 1);
+            }
+        }
+    }
+
+    @return $value;
+}

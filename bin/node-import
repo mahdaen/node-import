@@ -3,27 +3,35 @@
 
 "use strict";
 
-var COLORS = require('colors/safe');
-var OPTIMIS = require('optimist');
-var IMPORTS = require('../index.js');
-var PACKAGE = require('../package.json');
+var COLORS  = require('colors/safe'),
+    OPTIMIS = require('optimist'),
+    IMPORTS = require('../index.js'),
+    PACKAGE = require('../package.json'),
+
+    npm     = require('npm'),
+    fst     = require('fs-extra'),
+
+    /* Getting Configs */
+    cfg     = require(process.cwd() + "/imports.json");
+
+var loc = cfg.location || './libraries';
 
 /* Boolean Getter */
-var tobool = function(obj) {
-    if ('string' === typeof obj) {
-        if (obj === 'true') {
+var tobool = function (obj) {
+    if ( 'string' === typeof obj ) {
+        if ( obj === 'true' ) {
             return true;
         }
-        else if (obj === 'false') {
+        else if ( obj === 'false' ) {
             return false;
         }
     }
 
-    else if ('boolean' === typeof obj) {
-        if (obj === true) {
+    else if ( 'boolean' === typeof obj ) {
+        if ( obj === true ) {
             return true;
         }
-        else if (obj === false) {
+        else if ( obj === false ) {
             return false;
         }
     }
@@ -33,10 +41,10 @@ var tobool = function(obj) {
 
 /* Usage Help */
 var usage =
-    COLORS.cyan('NodeJS Scripts Import/Export (' + PACKAGE.name + ')\n') +
-    COLORS.green('v' + PACKAGE.version + '\n') +
-    PACKAGE.description + '\n\n' +
-    COLORS.green('Usage: ') + COLORS.yellow('import') + ' ' + COLORS.cyan('[options] [files ...]');
+        COLORS.cyan('NodeJS Scripts Import/Export (' + PACKAGE.name + ')\n') +
+        COLORS.green('v' + PACKAGE.version + '\n') +
+        PACKAGE.description + '\n\n' +
+        COLORS.green('Usage: ') + COLORS.yellow('import') + ' ' + COLORS.cyan('[options] [files ...]');
 
 /* Executor */
 var exec = function (argv) {
@@ -48,12 +56,12 @@ var exec = function (argv) {
     var DIR = 'string' == typeof argv.o ? argv.o : null;
 
     var opt = {
-        exec: RUN,
-        async: ASY,
-        export: EXP,
-        exportDir: DIR,
-        exportMin: MIN,
-        exportMap: MAP,
+        exec      : RUN,
+        async     : ASY,
+        export    : EXP,
+        exportDir : DIR,
+        exportMin : MIN,
+        exportMap : MAP,
     }
 
     return IMPORTS(argv._, opt, argv.v);
@@ -63,50 +71,142 @@ var exec = function (argv) {
 OPTIMIS
     .usage(usage)
     .options('r', {
-        describe: 'Run imported scripts.',
-        type: 'boolean',
-        default: false
+        describe : 'Run imported scripts.',
+        type     : 'boolean',
+        default  : false
     })
     .options('a', {
-        describe: 'Run in async mode.',
-        type: 'boolean',
-        default: false
+        describe : 'Run in async mode.',
+        type     : 'boolean',
+        default  : false
     })
     .options('e', {
-        describe: 'Export imported scripts.',
-        type: 'boolean',
-        default: false
+        describe : 'Export imported scripts.',
+        type     : 'boolean',
+        default  : false
     })
     .options('u', {
-        describe: 'Uglify exported scripts.',
-        type: 'boolean',
-        default: false
+        describe : 'Uglify exported scripts.',
+        type     : 'boolean',
+        default  : false
     })
     .options('s', {
-        describe: 'Include sourcemap of exported scripts.',
-        type: 'boolean',
-        default: false
+        describe : 'Include sourcemap of exported scripts.',
+        type     : 'boolean',
+        default  : false
     })
     .options('o', {
-        describe: 'Output directory for exported scripts.',
-        type: 'string',
-        default: null
+        describe : 'Output directory for exported scripts.',
+        type     : 'string',
+        default  : null
     })
     .options('v', {
-        describe: 'Logs all processes.',
-        type: 'boolean',
-        default: false
+        describe : 'Logs all processes.',
+        type     : 'boolean',
+        default  : false
     })
     .options('h', {
-        describe: 'Show helps.'
+        describe : 'Show helps.'
+    })
+    .options('i', {
+        describe : 'Install NPM Packages',
+    })
+    .options('save', {
+        describe : 'Save installed package to imports.json',
+        type     : 'boolean',
+        default  : false
     })
     .check(function (argv) {
-        if (argv.h) {
+        if ( argv.h ) {
             return OPTIMIS.showHelp();
-        } else {
-            if (!argv._.length) {
+        }
+
+        /* Install Package */
+        else if ( argv.i ) {
+            var list, alias = '', done = 0;
+
+            if (argv.o && 'string' == typeof argv.o) {
+                loc = argv.o;
+            }
+
+            if ( argv.i == true ) {
+                list = cfg.packages || [];
+
+                list.forEach(function (pkg) {
+                    alias += pkg + ', ';
+                });
+            }
+            else {
+                list = [ argv.i ], alias = argv.i;
+            }
+
+            argv._.forEach(function (pkg) {
+                list.push(pkg);
+                alias += pkg + ', ';
+            });
+
+            alias = alias.replace(/\,\s+$/, '');
+
+            var mvdir = function (org, dir) {
+                fst.move(org, dir, { clobber : true }, function (err) {
+                    if ( !err ) {
+                        done++;
+
+                        if ( done == list.length ) {
+                            console.log('Installed packages: ' + COLORS.yellow.bold(alias) + '.');
+
+                            fst.writeJSONSync(process.cwd() + "/imports.json", cfg);
+                        }
+                        else {
+                            nextpkg();
+                        }
+                    }
+                    else {
+                        console.log(err);
+                    }
+                });
+            }
+
+            var nextpkg = function () {
+                var org = './.imptemp/node_modules/' + list[ done ];
+                var dir = './' + loc.replace(/\/$/, '') + '/' + list[ done ];
+
+                console.log('Finishing install ' + list[ done ] + ' ...');
+
+                if ( argv.save == true ) {
+                    var id = cfg.packages.indexOf(list[ done ]);
+
+                    if ( id == -1 ) {
+                        cfg.packages.push(list[ done ]);
+                    }
+                }
+
+                if ( fst.existsSync(dir) ) {
+                    fst.remove(dir, function () {
+                        mvdir(org, dir);
+                    });
+                }
+                else {
+                    mvdir(org, dir);
+                }
+            }
+
+            npm.load(function () {
+                console.log('Installing ' + COLORS.yellow.bold(alias) + ' ...');
+
+                npm.commands.install('./.imptemp/', list, function (err, data) {
+                    if ( !err ) {
+                        nextpkg();
+                    }
+                });
+            });
+        }
+
+        else {
+            if ( !argv._.length ) {
                 throw new Error("input required");
-            } else {
+            }
+            else {
                 exec(argv);
             }
         }

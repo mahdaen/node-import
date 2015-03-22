@@ -1,0 +1,32 @@
+// Input Placeholder Wrapper
+@mixin input-placeholder {
+    &::-webkit-input-placeholder {
+        @content;
+    }
+    &::-moz-input-placeholder {
+        @content;
+    }
+    &::-ms-input-placeholder {
+        @content;
+    }
+    &::-o-input-placeholder {
+        @content;
+    }
+}
+
+// Selection Wrapper
+@mixin text-selection {
+    &::selection {
+        @content;
+    }
+    &::-moz-selection {
+        @content;
+    }
+}
+
+// Focus inner border
+@mixin focus-inner-border {
+    &::-moz-focus-inner {
+        @content;
+    }
+}

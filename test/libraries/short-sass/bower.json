@@ -1,0 +1,23 @@
+{
+    "name": "short-sass",
+    "version": "1.1.6",
+    "description": "Just another SASS library, simplify the way you use SASS.",
+    "main": "dist/short-sass.scss",
+    "ignore": [
+        "node_modules",
+        "**/.*",
+        "bower_components",
+        "test",
+        "tests"
+    ],
+    "authors": [
+        "Nanang Mahdaen El Agung <nanang@mahdaen.name>"
+    ],
+    "keywords": [
+        "sass",
+        "library",
+        "css"
+    ],
+    "license": "MIT",
+    "homepage": "https://github.com/short-sass/short-sass"
+}

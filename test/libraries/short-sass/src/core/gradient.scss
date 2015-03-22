@@ -1,0 +1,46 @@
+// GRADIENT GENERATOR
+$tmp-w-gradient: none;
+$tmp-m-gradient: none;
+$tmp-s-gradient: none;
+$tmp-o-gradient: none;
+
+@mixin gradient($type, $value, $append: false) {
+    @if ($tmp-w-gradient == none) {
+        // Create First Value
+        $tmp-w-gradient: -webkit-#{$type}#{'-gradient('}#{$value}#{')'} !global;
+        $tmp-m-gradient: -moz-#{$type}#{'-gradient('}#{$value}#{')'} !global;
+        $tmp-s-gradient: -ms-#{$type}#{'-gradient('}#{$value}#{')'} !global;
+        $tmp-o-gradient: -o-#{$type}#{'-gradient('}#{$value}#{')'} !global;
+    }
+    @else {
+        // Appending Value
+        $tmp-w-gradient: ($tmp-w-gradient, -webkit-#{$type}#{'-gradient('}#{$value}#{')'}) !global;
+        $tmp-m-gradient: ($tmp-m-gradient, -moz-#{$type}#{'-gradient('}#{$value}#{')'}) !global;
+        $tmp-s-gradient: ($tmp-s-gradient, -ms-#{$type}#{'-gradient('}#{$value}#{')'}) !global;
+        $tmp-o-gradient: ($tmp-o-gradient, -o-#{$type}#{'-gradient('}#{$value}#{')'}) !global;
+    }
+
+    @if ($append == false) {
+        // Applying Styles
+        background-image: $tmp-w-gradient;
+        background-image: $tmp-m-gradient;
+        background-image: $tmp-s-gradient;
+        background-image: $tmp-o-gradient;
+
+        // Resetting Temporary Value
+        $tmp-w-gradient: none !global;
+        $tmp-m-gradient: none !global;
+        $tmp-s-gradient: none !global;
+        $tmp-o-gradient: none !global;
+    }
+}
+
+// LINEAR GRADIENT GENERATOR
+@mixin linear-gradient($value, $append: false) {
+    @include gradient(linear, $value, $append);
+}
+
+// RADIAL GRADIENT GENERATOR
+@mixin radial-gradient($value, $append: false) {
+    @include gradient(radial, $value, $append);
+}
