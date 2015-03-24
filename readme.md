@@ -455,6 +455,8 @@ To test it, install the module, cd to the module folder and run **`npm test`**
 ***
 ### **`Release History`**
 
+* 2015-03-24        v0.7.2      "Fixing error when no imports.json file in the cwd."
+* 2015-03-23        v0.7.1      "Updating readme."
 * 2015-03-22        v0.7.0      "Adding CLI package installer."
 * 2015-03-22        v0.6.1      "Improving Readme"
 * 2015-03-08        v0.6.0      "Adding include() module"

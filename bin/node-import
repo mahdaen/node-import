@@ -11,8 +11,19 @@ var COLORS  = require('colors/safe'),
     npm     = require('npm'),
     fst     = require('fs-extra'),
 
-    /* Getting Configs */
-    cfg     = require(process.cwd() + "/imports.json");
+    /* Has Install Configs */
+    has     = false, cfg;
+
+if (fst.existsSync(process.cwd() + '/imports.json')) {
+    has = true;
+
+    cfg = require(process.cwd() + "/imports.json");
+} else {
+    cfg = {
+        packages: [],
+        loc: './libraries'
+    }
+}
 
 var loc = cfg.location || './libraries';
 
@@ -125,7 +136,7 @@ OPTIMIS
         else if ( argv.i ) {
             var list, alias = '', done = 0;
 
-            if (argv.o && 'string' == typeof argv.o) {
+            if ( argv.o && 'string' == typeof argv.o ) {
                 loc = argv.o;
             }
 
