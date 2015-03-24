@@ -21,7 +21,7 @@ if (fst.existsSync(process.cwd() + '/imports.json')) {
 } else {
     cfg = {
         packages: [],
-        loc: './libraries'
+        location: './libraries'
     }
 }
 
