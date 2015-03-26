@@ -3,29 +3,267 @@
 
 "use strict";
 
-var COLORS  = require('colors/safe'),
-    OPTIMIS = require('optimist'),
-    IMPORTS = require('../index.js'),
-    PACKAGE = require('../package.json'),
+var colors  = require('colors/safe'),
+    optimis = require('optimist'),
+    imports = require('../index.js'),
+    configs = require('../package.json'),
 
     npm     = require('npm'),
-    fst     = require('fs-extra'),
+    fst     = require('fs-extra');
 
-    /* Has Install Configs */
-    has     = false, cfg;
+/* Installer Definitions */
+var collection;
 
-if (fst.existsSync(process.cwd() + '/imports.json')) {
-    has = true;
+if ( fst.existsSync(process.cwd() + '/imports.json') ) {
+    collection = require(process.cwd() + '/imports.json');
+}
 
-    cfg = require(process.cwd() + "/imports.json");
-} else {
-    cfg = {
-        packages: [],
-        location: './libraries'
+/* Configs should have default options */
+if ( !collection || !'object' == typeof collection ) {
+    collection = {
+        'default' : {
+            packages : [],
+            location : 'imports/'
+        }
+    }
+}
+else if ( 'object' == typeof collection && !'default' in collection ) {
+    collection[ 'default' ] = {
+        packages : [],
+        location : 'imports/'
     }
 }
 
-var loc = cfg.location || './libraries';
+/* Install List */
+var installs = [];
+var complete = [];
+
+/* Installer Definitions Configurator */
+var initconf = function (pkglist, save, output) {
+    /* If no package target, then use install from json */
+    if ( !Array.isArray(pkglist) ) {
+        for ( var prop in collection ) {
+            if ( collection[ prop ].packages.length > 0 ) {
+                installs.push({
+                    output : collection[ prop ].location,
+                    module : collection[ prop ].packages,
+                    target : prop,
+                    update : false
+                });
+            }
+        }
+    }
+
+    /* If has package target, then use new install */
+    else {
+        /* Check does need to save installed packages or not */
+        if ( save ) {
+            /* If should be saved, then try look the output. */
+            if ( 'string' == typeof output ) {
+                /* If found output in collections, then append to that collection */
+                if ( output in collection ) {
+                    installs.push({
+                        output : collection[ output ].location,
+                        module : pkglist,
+                        target : output,
+                        update : true
+                    });
+                }
+
+                /* Else if collection not found, use default collection */
+                else {
+                    installs.push({
+                        output : output,
+                        module : pkglist,
+                        target : 'default',
+                        update : true
+                    });
+
+                    if ( collection[ 'default' ].location === 'imports/' ) {
+                        collection[ 'default' ].location = output;
+                    }
+                }
+            }
+
+            /* If no output defined, use default ouput (main collection) */
+            else {
+                installs.push({
+                    output : collection[ 'default' ].location,
+                    module : pkglist,
+                    target : 'default',
+                    update : true
+                });
+            }
+        }
+
+        /* If not should to save, check does has custom output */
+        else {
+            /* If has custom output, install in that location wihtout saving */
+            if ( 'string' == typeof output ) {
+                if ( output in collection ) {
+                    installs.push({
+                        output : collection[ output ].location,
+                        module : pkglist,
+                        target : output,
+                        update : false
+                    });
+                }
+                else {
+                    installs.push({
+                        output : output,
+                        module : pkglist,
+                        target : 'default',
+                        update : false
+                    });
+                }
+            }
+
+            /* Else use default location and without saving */
+            else {
+                installs.push({
+                    output : collection[ 'default' ].location,
+                    module : pkglist,
+                    target : 'default',
+                    update : false
+                });
+            }
+        }
+    }
+
+    install();
+}
+
+/* Pacakge Installer */
+var install = function () {
+    var cdone = 0, pdone = 0;
+
+    if ( installs.length > 0 ) {
+        nextcol();
+    }
+
+    /* Next Collection */
+    function nextcol() {
+        if ( cdone < installs.length ) {
+            /* Getting Target */
+            var target = installs[ cdone ];
+
+            /* Increase done stat */
+            cdone++;
+
+            /* Creating current install list */
+            var alias = '';
+
+            target.module.forEach(function (name) {
+                alias += name + ', ';
+            });
+
+            alias = alias.replace(/\,\s+$/, '');
+
+            /* NPM Install */
+            npm.load(function () {
+                /* Print that we're currently installing packages */
+                console.log(colors.green.bold('\r\nInstalling ') +
+                colors.yellow.bold('[ ' + alias + ' ]') + ' into ' +
+                colors.yellow.bold(target.output) + ' ...\r\n');
+
+                npm.commands.install('./.imptemp/', target.module, function (err, data) {
+                    if ( !err ) {
+                        movepkg(target);
+                    }
+                });
+            });
+        }
+        else {
+            cdone = 0;
+
+            savepkg();
+        }
+    }
+
+    /* Save Packages */
+    function savepkg() {
+        var save = false;
+
+        /* Creating current install list */
+        var alias = '';
+
+        complete.forEach(function (name) {
+            alias += name + ', ';
+        });
+
+        alias = alias.replace(/\,\s+$/, '');
+
+        /* Appending Packages */
+        for ( var prop in installs ) {
+            var current = installs[ prop ];
+
+            if ( current.update ) {
+                save = true;
+
+                current.module.forEach(function (pkg) {
+                    if ( collection[ current.target ].packages.indexOf(pkg) < 0 ) {
+                        collection[ current.target ].packages.push(pkg);
+                    }
+                });
+            }
+        }
+
+        /* Saving Packages */
+        if ( save ) {
+            fst.writeJSONSync(process.cwd() + '/imports.json', collection);
+        }
+
+        /* Print Complete Status */
+        console.log(colors.bold('\r\nInstalled Packages: ') + colors.yellow.bold('[ ' + alias + ' ]'));
+    }
+
+    /* Move Installed */
+    function movepkg(target) {
+        /* If move not completed, keep looping */
+        if ( pdone < target.module.length ) {
+            var current = target.module[ pdone ];
+
+            var itarget = './.imptemp/node_modules/' + current;
+            var mtarget = target.output.replace(/\/$/, '').replace(/^\.\//, '') + '/' + current;
+
+            console.log(colors.green.bold('\r\nFinishing install ') + colors.yellow.bold(current) + ' ...');
+
+            /* Check if target dir is exists */
+            if ( fst.existsSync('./' + mtarget) ) {
+                fst.removeSync('./' + mtarget);
+            }
+
+            /* Moving Packages from temporary location */
+            fst.move(itarget, './' + mtarget, { clobber : true }, function (err) {
+                if ( !err ) {
+                    /* Increasing done stat */
+                    pdone++;
+
+                    /* Print install current package complete */
+                    console.log(colors.yellow.bold(current) + ' installed in ' + colors.yellow.bold(mtarget));
+
+                    /* Push to complete states */
+                    complete.push(current);
+
+                    /* Move next package */
+                    movepkg(target);
+                }
+                else {
+                    console.log(err);
+                }
+            });
+        }
+
+        /* If install collection completed, install next collection. */
+        else {
+            /* Reset done stat */
+            pdone = 0;
+
+            /* Proceed next collection */
+            nextcol();
+        }
+    }
+}
 
 /* Boolean Getter */
 var tobool = function (obj) {
@@ -52,10 +290,10 @@ var tobool = function (obj) {
 
 /* Usage Help */
 var usage =
-        COLORS.cyan('NodeJS Scripts Import/Export (' + PACKAGE.name + ')\n') +
-        COLORS.green('v' + PACKAGE.version + '\n') +
-        PACKAGE.description + '\n\n' +
-        COLORS.green('Usage: ') + COLORS.yellow('import') + ' ' + COLORS.cyan('[options] [files ...]');
+        colors.cyan('NodeJS Scripts Import/Export (' + configs.name + ')\n') +
+        colors.green('v' + configs.version + '\n') +
+        configs.description + '\n\n' +
+        colors.green('Usage: ') + colors.yellow('import') + ' ' + colors.cyan('[options] [files ...]');
 
 /* Executor */
 var exec = function (argv) {
@@ -75,11 +313,11 @@ var exec = function (argv) {
         exportMap : MAP,
     }
 
-    return IMPORTS(argv._, opt, argv.v);
+    return imports(argv._, opt, argv.v);
 }
 
 /* Registering Options */
-OPTIMIS
+optimis
     .usage(usage)
     .options('r', {
         describe : 'Run imported scripts.',
@@ -128,95 +366,56 @@ OPTIMIS
         default  : false
     })
     .check(function (argv) {
+        /* Show Helps */
         if ( argv.h ) {
-            return OPTIMIS.showHelp();
+            return optimis.showHelp();
         }
 
         /* Install Package */
         else if ( argv.i ) {
-            var list, alias = '', done = 0;
+            /* Creating Package List */
+            var pkglist = [];
 
-            if ( argv.o && 'string' == typeof argv.o ) {
-                loc = argv.o;
+            /* Append Target Package */
+            if ( 'string' == typeof argv.i ) {
+                pkglist.push(argv.i);
             }
-
-            if ( argv.i == true ) {
-                list = cfg.packages || [];
-
-                list.forEach(function (pkg) {
-                    alias += pkg + ', ';
-                });
-            }
-            else {
-                list = [ argv.i ], alias = argv.i;
-            }
-
             argv._.forEach(function (pkg) {
-                list.push(pkg);
-                alias += pkg + ', ';
+                pkglist.push(pkg);
             });
 
-            alias = alias.replace(/\,\s+$/, '');
-
-            var mvdir = function (org, dir) {
-                fst.move(org, dir, { clobber : true }, function (err) {
-                    if ( !err ) {
-                        done++;
-
-                        if ( done == list.length ) {
-                            console.log('Installed packages: ' + COLORS.yellow.bold(alias) + '.');
-
-                            fst.writeJSONSync(process.cwd() + "/imports.json", cfg);
-                        }
-                        else {
-                            nextpkg();
-                        }
-                    }
-                    else {
-                        console.log(err);
-                    }
-                });
-            }
-
-            var nextpkg = function () {
-                var org = './.imptemp/node_modules/' + list[ done ];
-                var dir = './' + loc.replace(/\/$/, '') + '/' + list[ done ];
-
-                console.log('Finishing install ' + list[ done ] + ' ...');
-
+            if ( pkglist.length > 0 ) {
                 if ( argv.save == true ) {
-                    var id = cfg.packages.indexOf(list[ done ]);
-
-                    if ( id == -1 ) {
-                        cfg.packages.push(list[ done ]);
+                    if ( 'string' == typeof argv.o ) {
+                        initconf(pkglist, true, argv.o);
                     }
-                }
 
-                if ( fst.existsSync(dir) ) {
-                    fst.remove(dir, function () {
-                        mvdir(org, dir);
-                    });
+                    else {
+                        initconf(pkglist, true);
+                    }
                 }
                 else {
-                    mvdir(org, dir);
+                    if ( 'string' == typeof argv.o ) {
+                        initconf(pkglist, false, argv.o);
+                    }
+                    else {
+                        initconf(pkglist);
+                    }
                 }
             }
 
-            npm.load(function () {
-                console.log('Installing ' + COLORS.yellow.bold(alias) + ' ...');
-
-                npm.commands.install('./.imptemp/', list, function (err, data) {
-                    if ( !err ) {
-                        nextpkg();
-                    }
-                });
-            });
+            else {
+                initconf();
+            }
         }
 
+        /* No Inputs Defined */
         else {
             if ( !argv._.length ) {
                 throw new Error("input required");
             }
+
+            /* Import Scripts */
             else {
                 exec(argv);
             }

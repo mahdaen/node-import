@@ -397,14 +397,11 @@ folder is fine.
 
 **Usage**
 
-To makes the installer working, you must have **`imports.json`** file in the root folder of your project
-with properties:
-
-* **packages** - Array packages list to be installed by **`node-import -i`**
-* **location** - String location install the packages.
+You can install packages anywhere. If you want to install multiple packages in multiple collection, you can
+write **`imports.json`** file before running install. 
 
 ```
-node-import -i [PACKAGES] (--save)
+node-import -i [PACKAGES] (-o) (--save)
 ```
 
 ---
@@ -413,7 +410,8 @@ node-import -i [PACKAGES] (--save)
 | **Name** | **Type** | **Description** |
 | -------- | -------- | --------------- |
 | PACKAGES | `String` | String package name to install. You can install multiple packages by separate them using space. |
-| SAVE `optional` | `Boolean` | Save the installed package to **`imports.json`** if not already exists.
+| o `optional` | `String` | String output dir name or collection name.
+| SAVE `optional` | `Boolean` | Save the installed package to **`imports.json`** if not already exists and append if already exists.
 
 ---
 **Example**
@@ -421,20 +419,30 @@ node-import -i [PACKAGES] (--save)
 **`imports.json`**
 ```json
 {
-	"packages": ["short-sass", "native-js"],
-	"location: "libraries/"
+	"default": {
+		"packages": ["short-sass", "native-js"],
+		"location: "libraries/"
+	},
+	"corelibs": {
+		"packages": ["express", "async"],
+		"location": "corelibs"
+	}
 }
 ```
 
 ```shell
-# Install and add the installed packages to imports.json.
-node-import -i short-sass grunt-export --save
 
 # Install all packages in imports.json
 node-import -i
 
+# Install and add the installed packages to imports.json. If imports.json not exists, it's will be created.
+node-import -i short-sass grunt-export --save
+
 # Custom installation dir, not using the location in imports()
-node-import -i -o core-sys/libs --save short-sass native-js
+node-import -i short-sass native-js -o core-sys/libs --save
+
+# Add new package to "corelibs" collection.
+node-import -i domlist -o corelibs --save
 ```
 
 
@@ -455,6 +463,7 @@ To test it, install the module, cd to the module folder and run **`npm test`**
 ***
 ### **`Release History`**
 
+* 2015-03-26        v0.8.0      "Adding structural install options."
 * 2015-03-24        v0.7.3      "Fixing default location property name."
 * 2015-03-24        v0.7.2      "Fixing error when no imports.json file in the cwd."
 * 2015-03-23        v0.7.1      "Updating readme."
