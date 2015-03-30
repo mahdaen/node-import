@@ -302,6 +302,8 @@ var exec = function (argv) {
     var EXP = tobool(argv.e);
     var MIN = tobool(argv.u);
     var MAP = tobool(argv.s);
+    var BET = tobool(argv.b);
+    var NOS = tobool(argv.n);
     var DIR = 'string' == typeof argv.o ? argv.o : null;
 
     var opt = {
@@ -311,6 +313,8 @@ var exec = function (argv) {
         exportDir : DIR,
         exportMin : MIN,
         exportMap : MAP,
+        beautify  : BET,
+        noscript: NOS
     }
 
     return imports(argv._, opt, argv.v);
@@ -326,6 +330,16 @@ optimis
     })
     .options('a', {
         describe : 'Run in async mode.',
+        type     : 'boolean',
+        default  : false
+    })
+    .options('b', {
+        describe : 'Beautify Scripts',
+        type     : 'boolean',
+        default  : true
+    })
+    .options('n', {
+        describe : 'Tell as non-javascript concat',
         type     : 'boolean',
         default  : false
     })

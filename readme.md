@@ -373,6 +373,8 @@ node-import [options] [file ..]
 - `-u` Include uglify when exporting scripts. Default `false`
 - `-s` Include sourcemap when uglifying. Default `false`
 - `-o` Output directory to export.
+- `-n` Mark as non-javascript files. Default `false`.
+- `-b` Beautify scripts. Default `true`.
 - `-v` Logs all processes.
 - `-h` Show helps.
 
@@ -451,11 +453,15 @@ node-import -i domlist -o corelibs --save
 More examples available in **`test/`** folder.
 To test it, install the module, cd to the module folder and run **`npm test`**
 
+To concat non-javascript files, add **`noscript`** options and set **`beautify`** to false in options.
+If you want to beautify the non-javascript files, you can define custom formatter by adding **`formatter`** in options.
+Formatter should be a javascript function.
+
 ***
 ### **`Limitation`**
 
 * Currently we don't support importing minified javascripts.
-* Namespace only read global variables in imported scripts.
+* Namespace only read global variables in imported scripts. Namespace also only available for javascript.
 * `imports()` run script in `global` context.
 * `imports.module()` only share variable in the import result.
 * `include()` is just like `require()`, no sharable object in the result.
@@ -463,6 +469,7 @@ To test it, install the module, cd to the module folder and run **`npm test`**
 ***
 ### **`Release History`**
 
+* 2015-03-30        v0.9.0      "Adding support to concat non-javascript files."
 * 2015-03-26        v0.8.0      "Adding structural install options."
 * 2015-03-24        v0.7.3      "Fixing default location property name."
 * 2015-03-24        v0.7.2      "Fixing error when no imports.json file in the cwd."

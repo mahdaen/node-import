@@ -3,6 +3,10 @@
 '@import people/smith';
 '@import people/william';
 
+var x = function() {
+    '@import people/michael';
+}
+
 /* Showing Michael */
 console.log(('\nIt should be display profile of Michael with age overriden by William'));
 michael.profile();
