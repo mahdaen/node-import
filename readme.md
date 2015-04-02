@@ -15,6 +15,8 @@ to ensure each files can communicate with each others, including the global vari
 Now, you can export the scripts and run it in browser. I mean if you only need to concatenate files
 and minify them but still needs namespace for each file. ;)
 
+Find usage samples in [here](http://notes.mahdaen.name)
+
 ***
 **Is it usefull?**
 ```javascript
@@ -469,6 +471,7 @@ Formatter should be a javascript function.
 ***
 ### **`Release History`**
 
+* 2015-03-30        v0.9.1      "Updating Readme."
 * 2015-03-30        v0.9.0      "Adding support to concat non-javascript files."
 * 2015-03-26        v0.8.0      "Adding structural install options."
 * 2015-03-24        v0.7.3      "Fixing default location property name."
