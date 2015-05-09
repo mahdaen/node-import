@@ -163,9 +163,47 @@ var imports = function (source, options, verbose) {
     if ( 'string' === typeof source ) {
         /* Get start time */
         var pfstart = new Date().getTime();
+        var stats, files;
 
-        /* v0.4.2 - Trying to resolve file */
-        if ( !fs.existsSync('./' + source) ) {
+        /* Try to get directory/file stats */
+        try {
+            stats = fs.statSync('./' + source);
+
+            if ( stats.isDirectory() ) {
+                /* Log in verbose */
+                if ( verbose ) {
+                    console.log(cl.blue.bold.italic('Sources is solved as directory.'));
+                    console.log(cl.blue.bold.italic('Importing all files and folders inside ')
+                    + cl.yellow.bold(source + '/'));
+                }
+
+                files = fs.readdirSync('./' + source);
+
+                if ( files && files.length > 0 ) {
+                    var scripts = '', result;
+
+                    files.forEach(function (file, i) {
+                        var scr = imports(source.replace(/\/$/, '') + '/' + file, options, verbose);
+
+                        if ( scr ) {
+                            scripts += scr.text;
+
+                            if ( i == 0 ) {
+                                result = scr;
+                            }
+                        }
+                    });
+
+                    if ( result ) {
+                        result.text = scripts;
+
+                        return result;
+                    }
+                }
+            }
+        }
+        catch ( err ) {
+            /* Try to search files if file/folder is not exist at all */
             /* Log in verbose */
             if ( verbose ) {
                 console.log(cl.magenta.bold.italic('Can\'t resolve ')
@@ -525,7 +563,7 @@ InlineScript.prototype = {
 
                 /* Search for directory file list */
                 else if ( file.search(/\*/) > -1 ) {
-                    dir = pt.dirname(file.replace(/\@import\s+/, ''));
+                    dir = pt.dirname(file.replace(/\@import\s+/, '').replace(/\'/g, ''));
 
                     /* Reading directory */
                     files = fs.readdirSync(pc.cwd() + '/' + dir);
@@ -541,13 +579,44 @@ InlineScript.prototype = {
 
                 /* Search patterned files */
                 else {
-                    var cfile = file.replace(/[\'\"\;]+/g, '').replace(/\@import\s+/, '');
+                    var cfile = file.replace(/[\'\"\;]+/g, '').replace(/\@import\s+/, '').replace(/^\//, '');
+                    var stats, files, cwdc = pc.cwd();
 
-                    if ( !fs.existsSync(cfile) ) {
-                        var fnd = gl.sync(cfile + '*');
+                    if ( cfile.match(/\$root/) ) {
+                        cwdc = $this.cwds.cwds.replace(/\/$/, '');
+                        cfile = cfile.replace(/\$root/, '').replace(/^\//, '');
+                    }
 
-                        if ( fnd && fnd.length > 0 ) {
-                            multiple = fnd;
+                    /* Trying to find directory/file */
+                    try {
+                        /* Get file stats */
+                        stats = fs.statSync(cwdc + '/' + cfile);
+
+                        /* If stats is directory, then scan whole directory. */
+                        if ( stats.isDirectory() === true ) {
+                            files = fs.readdirSync(cwdc + '/' + cfile);
+
+                            if ( files && files.length > 0 ) {
+                                multiple = [];
+
+                                files.forEach(function (name) {
+                                    multiple.push(cfile + '/' + name);
+                                });
+                            }
+                        }
+                    }
+                    catch ( err ) {
+                        /* Search for files or folders if source is not exists at all */
+                        if ( !fs.existsSync(cfile) ) {
+                            var fnd = gl.sync(cfile + '*');
+
+                            if ( fnd && fnd.length > 0 ) {
+                                multiple = fnd;
+                            }
+                            else {
+                                console.log(cl.red.bold('ERROR! Can not resolve sources, or sources is not string or directory.'));
+                                throw err;
+                            }
                         }
                     }
                 }

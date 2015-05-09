@@ -471,6 +471,7 @@ Formatter should be a javascript function.
 ***
 ### **`Release History`**
 
+* 2015-05-10        v0.9.2      "Fixing files and directory resolver issues."
 * 2015-03-30        v0.9.1      "Updating Readme."
 * 2015-03-30        v0.9.0      "Adding support to concat non-javascript files."
 * 2015-03-26        v0.8.0      "Adding structural install options."
