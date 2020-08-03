@@ -76,7 +76,7 @@ Imports.module = function (source, params, verbose) {
     if ( 'object' == typeof params && !params.length ) {
         for ( var key in params ) {
             if ( params.hasOwnProperty(key) ) {
-                // since `key` is a `variable name`, it's needed verifying the `variable name`
+                // validating the syntax of `key` since it's a variable name
                 var valid_name_regex = "^[a-z_]\\w*$";
                 if(key.match(valid_name_regex) != null)
                     eval('var ' + key + ' = params[key];');
